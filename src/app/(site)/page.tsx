@@ -201,7 +201,7 @@ export default async function HomePage() {
           <div className="section-head">
             <div>
               <p className="section-kicker">Blog</p>
-              <h2 className="section-title">Ofis yazılarımız</h2>
+              <h2 className="section-title">Blog yazılarımız</h2>
               <p className="section-lead">
                 Bu sitede yayınlanan yerel blog içerikleri.
               </p>
