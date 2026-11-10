@@ -5,31 +5,55 @@ import type { ExternalNewsItem } from "@/lib/external-news";
 
 function CalendarIcon({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <rect
-        x="3"
-        y="5"
-        width="18"
-        height="16"
-        rx="2"
+        x="3.5"
+        y="5.5"
+        width="17"
+        height="15"
+        rx="2.5"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.8"
       />
-      <path d="M3 9h18" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M3.5 9.5h17" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M8 3.5v4M16 3.5v4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-export function MaliGelismelerSlider({
-  items,
-  sourceLabel,
-  sourceUrl,
-}: {
-  items: ExternalNewsItem[];
-  sourceLabel: string;
-  sourceUrl: string;
-}) {
+function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d={direction === "left" ? "M14.5 6L9 12l5.5 6" : "M9.5 6L15 12l-5.5 6"}
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function themeClass(theme: string) {
+  const value = theme.toLowerCase().trim();
+  if (["navy", "blue", "indigo"].includes(value)) return "theme-navy";
+  if (["emerald", "green", "teal"].includes(value)) return "theme-emerald";
+  if (["amber", "gold", "yellow"].includes(value)) return "theme-amber";
+  return "theme-crimson";
+}
+
+export function MaliGelismelerSlider({ items }: { items: ExternalNewsItem[] }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -43,9 +67,7 @@ export function MaliGelismelerSlider({
   if (items.length === 0) {
     return (
       <div className="admin-panel">
-        <p style={{ margin: 0 }}>
-          Güncel mali gelişmeler yüklenemedi. Kaynak: {sourceLabel}
-        </p>
+        <p style={{ margin: 0 }}>Güncel mali gelişmeler şu an yüklenemedi.</p>
       </div>
     );
   }
@@ -55,32 +77,30 @@ export function MaliGelismelerSlider({
     setIndex((next + items.length) % items.length);
   };
 
-  const CardInner = (
-    <>
-      <div className={`mg-card theme-${item.theme}`}>
-        <div className="mg-grid" aria-hidden="true" />
-        <div className="mg-content">
-          <span className="mg-badge">
-            <CalendarIcon className="mg-badge-icon" />
-            {item.badge}
+  const card = (
+    <div className={`mg-card ${themeClass(item.theme)}`}>
+      <div className="mg-grid" aria-hidden="true" />
+      <div className="mg-content">
+        <span className="mg-badge">
+          <CalendarIcon className="mg-badge-icon" />
+          {item.badge}
+        </span>
+        <h3>{item.title}</h3>
+        {item.summary ? <p>{item.summary}</p> : null}
+        <div className="mg-meta">
+          <CalendarIcon className="mg-meta-icon" />
+          <span>
+            {item.dateLabel}
+            {item.dateLabel && item.source ? " — " : ""}
+            {item.source}
           </span>
-          <h3>{item.title}</h3>
-          {item.summary ? <p>{item.summary}</p> : null}
-          <div className="mg-meta">
-            <CalendarIcon className="mg-meta-icon" />
-            <span>
-              {item.dateLabel}
-              {item.dateLabel && item.source ? " — " : ""}
-              {item.source}
-            </span>
-          </div>
-        </div>
-        <div className="mg-decor" aria-hidden="true">
-          <CalendarIcon />
-          <span>!</span>
         </div>
       </div>
-    </>
+      <div className="mg-decor" aria-hidden="true">
+        <CalendarIcon />
+        <span>!</span>
+      </div>
+    </div>
   );
 
   return (
@@ -98,7 +118,7 @@ export function MaliGelismelerSlider({
           aria-label="Önceki"
           onClick={() => go(index - 1)}
         >
-          ‹
+          <ChevronIcon direction="left" />
         </button>
 
         {item.href ? (
@@ -108,10 +128,10 @@ export function MaliGelismelerSlider({
             rel="noopener noreferrer"
             className="mg-card-link"
           >
-            {CardInner}
+            {card}
           </a>
         ) : (
-          <div className="mg-card-link">{CardInner}</div>
+          <div className="mg-card-link">{card}</div>
         )}
 
         <button
@@ -120,7 +140,7 @@ export function MaliGelismelerSlider({
           aria-label="Sonraki"
           onClick={() => go(index + 1)}
         >
-          ›
+          <ChevronIcon direction="right" />
         </button>
       </div>
 
@@ -135,13 +155,6 @@ export function MaliGelismelerSlider({
           />
         ))}
       </div>
-
-      <p className="mg-source-note">
-        Kaynak:{" "}
-        <a href={sourceUrl} target="_blank" rel="noopener noreferrer">
-          {sourceLabel}
-        </a>
-      </p>
     </section>
   );
 }

@@ -538,13 +538,13 @@ img {
 }
 
 .mg-wrap {
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
+  padding: 1.15rem 0 0.85rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent);
 }
 
 .mg-section {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.75rem;
 }
 
 .mg-header {
@@ -584,39 +584,40 @@ img {
 
 .mg-slider {
   position: relative;
+  padding: 0 0.2rem;
 }
 
 .mg-card-link {
   display: block;
   color: inherit;
+  text-decoration: none;
 }
 
 .mg-card {
   position: relative;
   overflow: hidden;
-  min-height: 210px;
-  border-radius: 22px;
-  padding: 1.4rem 1.5rem;
-  color: white;
+  min-height: 220px;
+  border-radius: 24px;
+  padding: 1.45rem 3.4rem;
+  color: #fff;
+  background: linear-gradient(115deg, #5a1c1c 0%, #8b2e2e 42%, #c24545 100%);
   box-shadow: 0 18px 40px rgba(90, 24, 24, 0.22);
+  -webkit-font-smoothing: antialiased;
 }
 
 .mg-card.theme-crimson {
   background: linear-gradient(115deg, #5a1c1c 0%, #8b2e2e 42%, #c24545 100%);
 }
 
-.mg-card.theme-navy,
-.mg-card.theme-blue {
+.mg-card.theme-navy {
   background: linear-gradient(115deg, #0b2a3d 0%, #164860 45%, #2a6f8f 100%);
 }
 
-.mg-card.theme-emerald,
-.mg-card.theme-green {
+.mg-card.theme-emerald {
   background: linear-gradient(115deg, #0f3b2e 0%, #1b6b52 45%, #2f9b74 100%);
 }
 
-.mg-card.theme-amber,
-.mg-card.theme-gold {
+.mg-card.theme-amber {
   background: linear-gradient(115deg, #5a3b12 0%, #8a5a18 45%, #c4922e 100%);
 }
 
@@ -624,26 +625,26 @@ img {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
   background-size: 36px 36px;
-  opacity: 0.35;
+  opacity: 0.4;
   pointer-events: none;
 }
 
 .mg-content {
   position: relative;
   z-index: 2;
-  max-width: 78%;
+  max-width: min(760px, 78%);
 }
 
 .mg-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.7rem;
+  padding: 0.38rem 0.75rem;
   border-radius: 999px;
-  background: rgba(232, 201, 126, 0.95);
+  background: rgba(232, 201, 126, 0.96);
   color: #4a3410;
   font-size: 0.75rem;
   font-weight: 800;
@@ -652,21 +653,24 @@ img {
 
 .mg-badge-icon,
 .mg-meta-icon {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
 }
 
 .mg-content h3 {
-  margin: 0.9rem 0 0.55rem;
-  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
-  line-height: 1.25;
+  margin: 0.95rem 0 0.55rem;
+  font-size: clamp(1.18rem, 2.4vw, 1.58rem);
+  line-height: 1.28;
   font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
 }
 
 .mg-content p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.94);
+  line-height: 1.58;
   font-size: 0.98rem;
 }
 
@@ -675,20 +679,21 @@ img {
   align-items: center;
   gap: 0.45rem;
   margin-top: 1.2rem;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
 }
 
 .mg-decor {
   position: absolute;
-  right: 1.4rem;
+  right: 1.6rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 120px;
-  height: 120px;
-  opacity: 0.18;
+  width: 118px;
+  height: 118px;
+  opacity: 0.2;
   color: white;
   z-index: 1;
+  pointer-events: none;
 }
 
 .mg-decor svg {
@@ -713,24 +718,36 @@ img {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 3;
-  width: 38px;
-  height: 38px;
+  z-index: 5;
+  width: 42px;
+  height: 42px;
   border: 0;
   border-radius: 999px;
-  background: rgba(20, 30, 40, 0.72);
-  color: white;
-  font-size: 1.4rem;
-  line-height: 1;
+  background: rgba(15, 23, 32, 0.82);
+  color: #fff;
+  display: grid;
+  place-items: center;
   cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.mg-nav svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mg-nav:hover {
+  background: rgba(15, 23, 32, 0.95);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .mg-prev {
-  left: 0.55rem;
+  left: 0.7rem;
 }
 
 .mg-next {
-  right: 0.55rem;
+  right: 0.7rem;
 }
 
 .mg-dots {
@@ -738,7 +755,7 @@ img {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.4rem;
-  padding-top: 0.15rem;
+  padding-top: 0.1rem;
 }
 
 .mg-dots button {
@@ -749,6 +766,7 @@ img {
   background: #c5d5df;
   cursor: pointer;
   padding: 0;
+  transition: width 0.15s ease, background 0.15s ease;
 }
 
 .mg-dots button.is-active {
@@ -756,16 +774,32 @@ img {
   background: #1f3a45;
 }
 
-.mg-source-note {
-  margin: 0;
-  text-align: center;
-  color: #7a8795;
-  font-size: 0.82rem;
-}
+@media (max-width: 700px) {
+  .mg-card {
+    padding: 1.25rem 3rem 1.25rem 1.15rem;
+    min-height: 240px;
+  }
 
-.mg-source-note a {
-  color: var(--brand);
-  font-weight: 600;
+  .mg-content {
+    max-width: 100%;
+  }
+
+  .mg-decor {
+    display: none;
+  }
+
+  .mg-nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mg-prev {
+    left: 0.35rem;
+  }
+
+  .mg-next {
+    right: 0.35rem;
+  }
 }
 
 @keyframes livePulse {

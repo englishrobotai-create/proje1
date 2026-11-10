@@ -43,6 +43,12 @@ export default async function HomePage() {
 
   return (
     <>
+      <section className="mg-wrap">
+        <div className="container">
+          <MaliGelismelerSlider items={externalNews} />
+        </div>
+      </section>
+
       <section className="hero">
         <div className="hero-orb hero-orb-a" aria-hidden="true" />
         <div className="hero-orb hero-orb-b" aria-hidden="true" />
@@ -96,16 +102,6 @@ export default async function HomePage() {
               <circle cx="300" cy="35" r="5" fill="#c4a35a" />
             </svg>
           </div>
-        </div>
-      </section>
-
-      <section className="section mg-wrap">
-        <div className="container">
-          <MaliGelismelerSlider
-            items={externalNews}
-            sourceLabel={settings.externalNewsLabel}
-            sourceUrl={settings.externalNewsUrl}
-          />
         </div>
       </section>
 
