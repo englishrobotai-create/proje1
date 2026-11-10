@@ -651,49 +651,17 @@ img {
   height: 18px;
 }
 
-.section-heading-text {
-  display: flex;
-  align-items: baseline;
-  gap: 0.65rem;
-  min-width: 0;
+.section-heading-label {
+  margin: 0;
   flex: 1;
-}
-
-.section-heading-kicker {
-  margin: 0;
-  color: #8a7040;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.section-heading-title {
-  margin: 0;
-  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  min-width: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.15;
+  color: var(--brand-deep);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: linear-gradient(120deg, var(--brand-deep) 0%, #1a5563 60%, #8a7040 130%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.section-heading-lead,
-.section-heading-side-lead {
-  margin: 0;
-  max-width: 32ch;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-  line-height: 1.35;
-  text-align: right;
-  flex-shrink: 1;
 }
 
 .section-heading-trust .section-heading-icon {
@@ -1822,19 +1790,8 @@ textarea:focus {
     flex-wrap: wrap;
   }
 
-  .section-heading-text {
-    flex-wrap: wrap;
-  }
-
-  .section-heading-title {
+  .section-heading-label {
     white-space: normal;
-  }
-
-  .section-heading-lead,
-  .section-heading-side-lead {
-    text-align: left;
-    max-width: 58ch;
-    width: 100%;
   }
 
   .section-heading-action {

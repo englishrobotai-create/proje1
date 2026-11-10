@@ -48,14 +48,10 @@ const icons: Record<Variant, ReactNode> = {
 export function SectionHeading({
   variant,
   kicker,
-  title,
-  lead,
   action,
 }: {
   variant: Variant;
   kicker: string;
-  title: string;
-  lead?: string;
   action?: ReactNode;
 }) {
   return (
@@ -64,11 +60,7 @@ export function SectionHeading({
         <span className="section-heading-icon" aria-hidden="true">
           {icons[variant]}
         </span>
-        <div className="section-heading-text">
-          <span className="section-heading-kicker">{kicker}</span>
-          <h2 className="section-title section-heading-title">{title}</h2>
-        </div>
-        {lead ? <p className="section-lead section-heading-lead">{lead}</p> : null}
+        <h2 className="section-heading-label">{kicker}</h2>
         {action ? <div className="section-heading-action">{action}</div> : null}
       </div>
     </div>

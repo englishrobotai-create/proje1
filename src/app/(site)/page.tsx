@@ -86,11 +86,7 @@ export default async function HomePage() {
 
       <section className="section band-section">
         <div className="container">
-          <SectionHeading
-            variant="trust"
-            kicker="Güven odaklı"
-            title="Kurumsal disiplin, sade iletişim"
-          />
+          <SectionHeading variant="trust" kicker="Güven odaklı" />
         </div>
         <div className="container feature-grid">
           <article className="feature-item reveal">
@@ -125,7 +121,6 @@ export default async function HomePage() {
           <SectionHeading
             variant="services"
             kicker="Hizmetler"
-            title="Neler yapıyoruz"
             action={
               <Link href="/hizmetler" className="btn btn-secondary">
                 Tüm hizmetler
@@ -148,7 +143,6 @@ export default async function HomePage() {
           <SectionHeading
             variant="blog"
             kicker="Blog"
-            title="Blog yazılarımız"
             action={
               <Link href="/blog" className="btn btn-secondary">
                 Tüm yazılar
@@ -183,7 +177,6 @@ export default async function HomePage() {
           <SectionHeading
             variant="calculators"
             kicker="Hesaplama araçları"
-            title="Pratik mali hesaplamalar"
             action={
               <a
                 href="https://www.ozcankutlu.com/tr"
