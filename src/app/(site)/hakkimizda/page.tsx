@@ -3,7 +3,7 @@ import { PageHero } from "@/components/PageHero";
 import { getSiteSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
-  title: "Hakkımızda",
+  title: "Hakkımda",
 };
 
 export default async function AboutPage() {
@@ -13,7 +13,7 @@ export default async function AboutPage() {
     <>
       <PageHero
         kicker="Kurumsal profil"
-        title="Hakkımızda"
+        title="Hakkımda"
         description={settings.aboutIntro}
       />
 

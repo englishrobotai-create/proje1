@@ -12,7 +12,7 @@ export default async function AdminAboutPage() {
   return (
     <>
       <div className="admin-top">
-        <h2>Hakkımızda Sayfası</h2>
+        <h2>Hakkımda Sayfası</h2>
       </div>
       <div className="admin-panel" style={{ maxWidth: 760 }}>
         <AboutForm settings={settings} />

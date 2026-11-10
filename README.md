@@ -4,7 +4,7 @@ Ayrı kopya modeliyle satılmak üzere hazırlanmış Next.js mali müşavir sit
 
 ## Özellikler
 
-- Kurumsal vitrin: Ana sayfa, Hakkımızda, Hizmetler, Blog, İletişim
+- Kurumsal vitrin: Ana sayfa, Hakkımda, Hizmetler, Blog, İletişim
 - Admin paneli (`/admin/giris`)
 - Blog yazısı ekleme / düzenleme / silme
 - Site başlığını değiştirme

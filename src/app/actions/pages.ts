@@ -65,7 +65,7 @@ export async function updateAboutAction(
 
   revalidatePath("/hakkimizda");
   revalidatePath("/admin/hakkimizda");
-  return { success: "Hakkımızda sayfası kaydedildi" };
+  return { success: "Hakkımda sayfası kaydedildi" };
 }
 
 export async function updateContactAction(

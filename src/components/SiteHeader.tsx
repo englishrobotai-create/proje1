@@ -7,7 +7,7 @@ import type { SiteSettings } from "@/lib/settings";
 
 const links = [
   { href: "/", label: "Ana Sayfa" },
-  { href: "/hakkimizda", label: "Hakkımızda" },
+  { href: "/hakkimizda", label: "Hakkımda" },
   { href: "/hizmetler", label: "Hizmetler" },
   { href: "/blog", label: "Blog" },
   { href: "/iletisim", label: "İletişim" },

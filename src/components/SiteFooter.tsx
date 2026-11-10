@@ -18,7 +18,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
         <div>
           <p className="footer-heading">Keşfet</p>
           <div className="footer-links">
-            <Link href="/hakkimizda">Hakkımızda</Link>
+            <Link href="/hakkimizda">Hakkımda</Link>
             <Link href="/hizmetler">Hizmetler</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/yararli-linkler">Yararlı Linkler</Link>
