@@ -33,8 +33,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
 
       <h3 className="admin-subtitle">Güncel mali gelişmeler</h3>
       <p className="form-hint">
-        Ana sayfadaki CANLI kaydırıcı bu JSON API’den beslenir. Varsayılan:
-        ozcankutlu.com/api/news
+        Ana sayfadaki CANLI kaydırıcı bu JSON API’den beslenir.
       </p>
       <div className="form-row">
         <label>
@@ -57,72 +56,18 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         </label>
       </div>
 
-      <h3 className="admin-subtitle">Sosyal medya bağlantıları</h3>
-      <p className="form-hint">
-        Boş bırakılan alanlar sitede gösterilmez. Adresler https:// ile
-        başlamalıdır.
-      </p>
+      {/* Sosyal medya ayrı sayfada; mevcut değerleri koru */}
+      <input type="hidden" name="facebook" value={settings.facebook} />
+      <input type="hidden" name="instagram" value={settings.instagram} />
+      <input type="hidden" name="linkedin" value={settings.linkedin} />
+      <input type="hidden" name="twitter" value={settings.twitter} />
+      <input type="hidden" name="youtube" value={settings.youtube} />
+      <input type="hidden" name="whatsapp" value={settings.whatsapp} />
 
-      <div className="form-row">
-        <label>
-          Facebook
-          <input
-            name="facebook"
-            type="url"
-            placeholder="https://facebook.com/..."
-            defaultValue={settings.facebook}
-          />
-        </label>
-        <label>
-          Instagram
-          <input
-            name="instagram"
-            type="url"
-            placeholder="https://instagram.com/..."
-            defaultValue={settings.instagram}
-          />
-        </label>
-      </div>
-      <div className="form-row">
-        <label>
-          LinkedIn
-          <input
-            name="linkedin"
-            type="url"
-            placeholder="https://linkedin.com/company/..."
-            defaultValue={settings.linkedin}
-          />
-        </label>
-        <label>
-          X (Twitter)
-          <input
-            name="twitter"
-            type="url"
-            placeholder="https://x.com/..."
-            defaultValue={settings.twitter}
-          />
-        </label>
-      </div>
-      <div className="form-row">
-        <label>
-          YouTube
-          <input
-            name="youtube"
-            type="url"
-            placeholder="https://youtube.com/..."
-            defaultValue={settings.youtube}
-          />
-        </label>
-        <label>
-          WhatsApp
-          <input
-            name="whatsapp"
-            type="url"
-            placeholder="https://wa.me/905xxxxxxxxx"
-            defaultValue={settings.whatsapp}
-          />
-        </label>
-      </div>
+      <p className="form-hint">
+        Sosyal medya ikonları ve linkleri için{" "}
+        <a href="/admin/sosyal-medya">Sosyal Medya</a> menüsünü kullanın.
+      </p>
 
       {state.error ? <p className="form-error">{state.error}</p> : null}
       {state.success ? <p className="form-success">{state.success}</p> : null}
