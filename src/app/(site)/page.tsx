@@ -85,15 +85,18 @@ export default async function HomePage() {
       </section>
 
       <section className="section band-section">
-        <div className="container trust-band">
-          <div>
-            <p className="section-kicker">Güven odaklı</p>
-            <h2 className="section-title">Kurumsal disiplin, sade iletişim</h2>
-          </div>
-          <p className="section-lead">
-            Standart süreçlerimizle beyan, bordro ve danışmanlık işlerinizi tek
-            çatı altında takip ederiz.
-          </p>
+        <div className="container">
+          <SectionHeading
+            variant="trust"
+            kicker="Güven odaklı"
+            title="Kurumsal disiplin, sade iletişim"
+            action={
+              <p className="section-lead section-heading-side-lead">
+                Standart süreçlerimizle beyan, bordro ve danışmanlık işlerinizi
+                tek çatı altında takip ederiz.
+              </p>
+            }
+          />
         </div>
         <div className="container feature-grid">
           <article className="feature-item reveal">

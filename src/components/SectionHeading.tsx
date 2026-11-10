@@ -1,8 +1,20 @@
 import type { ReactNode } from "react";
 
-type Variant = "services" | "blog" | "calculators";
+type Variant = "trust" | "services" | "blog" | "calculators";
 
 const icons: Record<Variant, ReactNode> = {
+  trust: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 3.25 18.5 6v5.1c0 4.1-2.7 7.8-6.5 9.15C8.2 18.9 5.5 15.2 5.5 11.1V6zM12 5.1 7 7.25v3.85c0 3.15 2.05 6 5 7.1 2.95-1.1 5-3.95 5-7.1V7.25z"
+      />
+      <path
+        fill="currentColor"
+        d="M10.7 13.85 8.9 12l-1.05 1.05 2.85 2.85 5.1-5.1-1.05-1.05z"
+      />
+    </svg>
+  ),
   services: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path

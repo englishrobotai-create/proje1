@@ -701,6 +701,20 @@ img {
   margin-top: 0.9rem;
 }
 
+.section-heading-trust .section-heading-icon {
+  background: linear-gradient(145deg, #07262f, #1a5563);
+}
+
+.section-heading-trust .section-heading-title {
+  max-width: 14ch;
+}
+
+.section-heading-side-lead {
+  max-width: 34ch;
+  text-align: right;
+  margin: 0;
+}
+
 .section-heading-services .section-heading-icon {
   background: linear-gradient(145deg, #0d3b48, #145868);
 }
@@ -1817,6 +1831,11 @@ textarea:focus {
 
   .section-head {
     align-items: start;
+  }
+
+  .section-heading-side-lead {
+    text-align: left;
+    max-width: 58ch;
   }
 
   .header-top {
