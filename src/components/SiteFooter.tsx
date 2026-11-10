@@ -5,6 +5,7 @@ import { SocialLinks } from "./SocialLinks";
 export function SiteFooter({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="site-footer">
+      <div className="footer-accent" aria-hidden="true" />
       <div className="container footer-grid">
         <div>
           <p className="footer-brand">{settings.siteTitle}</p>
@@ -15,7 +16,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           <SocialLinks settings={settings} variant="light" />
         </div>
         <div>
-          <p className="footer-heading">Hızlı Bağlantılar</p>
+          <p className="footer-heading">Keşfet</p>
           <div className="footer-links">
             <Link href="/hakkimizda">Hakkımızda</Link>
             <Link href="/hizmetler">Hizmetler</Link>
@@ -29,6 +30,9 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           <p className="footer-text">info@ornek-mm.com</p>
           <p className="footer-text">+90 (212) 000 00 00</p>
           <p className="footer-text">İstanbul, Türkiye</p>
+          <Link href="/iletisim" className="footer-cta">
+            Görüşme talep edin →
+          </Link>
         </div>
       </div>
       <div className="container footer-bottom">
@@ -36,6 +40,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           © {new Date().getFullYear()} {settings.siteTitle}. Tüm hakları
           saklıdır.
         </p>
+        <p className="footer-note">Kurumsal mali müşavirlik sitesi</p>
       </div>
     </footer>
   );

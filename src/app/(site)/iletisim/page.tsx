@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
+import { PageHero } from "@/components/PageHero";
 import { getSiteSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
@@ -10,28 +11,39 @@ export default async function ContactPage() {
   const { siteTitle } = await getSiteSettings();
 
   return (
-    <div className="container page-hero">
-      <h1>İletişim</h1>
-      <p>
-        {siteTitle} ile görüşmek için formu doldurun. Mesajlarınız yönetim
-        paneline düşer.
-      </p>
-      <div className="contact-layout">
-        <div className="info-panel">
-          <ContactForm />
+    <>
+      <PageHero
+        kicker="İletişim"
+        title="Birlikte planlayalım"
+        description={`${siteTitle} ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.`}
+      />
+      <section className="section">
+        <div className="container contact-layout">
+          <div className="info-panel contact-form-panel">
+            <h2 className="panel-title">Mesaj gönderin</h2>
+            <ContactForm />
+          </div>
+          <aside className="info-panel contact-aside">
+            <h2 className="panel-title">Ofis bilgileri</h2>
+            <div className="contact-detail">
+              <span>E-posta</span>
+              <strong>info@ornek-mm.com</strong>
+            </div>
+            <div className="contact-detail">
+              <span>Telefon</span>
+              <strong>+90 (212) 000 00 00</strong>
+            </div>
+            <div className="contact-detail">
+              <span>Adres</span>
+              <strong>İstanbul, Türkiye</strong>
+            </div>
+            <div className="contact-detail">
+              <span>Çalışma saatleri</span>
+              <strong>Hafta içi 09:00 – 18:00</strong>
+            </div>
+          </aside>
         </div>
-        <aside className="info-panel">
-          <h3 style={{ marginTop: 0, fontFamily: "var(--font-display), serif" }}>
-            Ofis bilgileri
-          </h3>
-          <p>E-posta: info@ornek-mm.com</p>
-          <p style={{ marginTop: "0.6rem" }}>Telefon: +90 (212) 000 00 00</p>
-          <p style={{ marginTop: "0.6rem" }}>Adres: İstanbul, Türkiye</p>
-          <p style={{ marginTop: "1rem" }}>
-            Çalışma saatleri: Hafta içi 09:00 – 18:00
-          </p>
-        </aside>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

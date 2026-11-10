@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Libre_Baskerville, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
 import { getSiteSettings } from "@/lib/settings";
 import "./globals.css";
 
-const display = Libre_Baskerville({
+const display = Cormorant_Garamond({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["500", "600", "700"],
 });
 
-const body = Manrope({
+const body = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {

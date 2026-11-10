@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { SiteSettings } from "@/lib/settings";
 
@@ -14,19 +15,39 @@ const links = [
 
 export function SiteHeader({ settings }: { settings: SiteSettings }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="site-header">
+      <div className="header-top">
+        <div className="container header-top-inner">
+          <span>Mali müşavirlik · Vergi · Danışmanlık</span>
+          <span>Hafta içi 09:00 – 18:00</span>
+        </div>
+      </div>
       <div className="container header-inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
-          {settings.siteTitle}
+          <span className="brand-mark" aria-hidden="true">
+            {settings.siteTitle.slice(0, 1)}
+          </span>
+          <span className="brand-text">{settings.siteTitle}</span>
         </Link>
         <nav className="nav" aria-label="Ana menü">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="nav-link">
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) => {
+            const active =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-link${active ? " is-active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="header-right">
           <Link href="/iletisim" className="btn btn-primary header-cta">
@@ -57,6 +78,13 @@ export function SiteHeader({ settings }: { settings: SiteSettings }) {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/iletisim"
+            className="btn btn-primary"
+            onClick={() => setOpen(false)}
+          >
+            Randevu Alın
+          </Link>
         </div>
       ) : null}
     </header>
