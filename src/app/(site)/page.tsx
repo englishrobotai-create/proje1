@@ -83,6 +83,28 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section">
+        <div className="container">
+          <SectionHeading
+            variant="services"
+            kicker="Hizmetler"
+            action={
+              <Link href="/hizmetler" className="btn btn-secondary">
+                Tüm hizmetler
+              </Link>
+            }
+          />
+          <div className="service-grid home-services">
+            {homeServices.map((service) => (
+              <article key={service.id} className="service-item">
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section band-section">
         <div className="container">
           <SectionHeading variant="trust" kicker="Güven odaklı" />
@@ -112,28 +134,6 @@ export default async function HomePage() {
               yanınızdayız.
             </p>
           </article>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <SectionHeading
-            variant="services"
-            kicker="Hizmetler"
-            action={
-              <Link href="/hizmetler" className="btn btn-secondary">
-                Tüm hizmetler
-              </Link>
-            }
-          />
-          <div className="service-grid home-services">
-            {homeServices.map((service) => (
-              <article key={service.id} className="service-item">
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 

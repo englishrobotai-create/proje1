@@ -276,10 +276,10 @@ img {
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: min(72vh, 720px);
+  min-height: 0;
   display: grid;
   align-items: center;
-  padding: 4.2rem 0 4.8rem;
+  padding: 2rem 0 2.25rem;
 }
 
 .hero::before {
@@ -354,7 +354,7 @@ img {
 }
 
 .hero-title {
-  margin: 0 0 1rem;
+  margin: 0 0 0.7rem;
   font-size: clamp(1.3rem, 2.8vw, 1.9rem);
   font-weight: 500;
   line-height: 1.25;
@@ -362,7 +362,7 @@ img {
 }
 
 .hero-text {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.15rem;
   color: rgba(255, 255, 255, 0.82);
   font-size: 1.05rem;
   line-height: 1.7;
@@ -377,7 +377,7 @@ img {
 
 .hero-panel {
   position: relative;
-  min-height: 360px;
+  min-height: 280px;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
@@ -447,7 +447,7 @@ img {
 }
 
 .section {
-  padding: 4.8rem 0;
+  padding: 2.75rem 0;
 }
 
 .band-section {
@@ -513,7 +513,7 @@ img {
 .post-grid {
   display: grid;
   gap: 1.25rem;
-  margin-top: 2rem;
+  margin-top: 1.15rem;
 }
 
 .feature-grid {
@@ -693,7 +693,7 @@ img {
 
 .mg-wrap {
   width: 100%;
-  padding: 0.85rem 0 0.7rem;
+  padding: 0.55rem 0 0.4rem;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent);
 }
 
