@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -28,7 +29,14 @@ export function SiteHeader({ settings }: { settings: SiteSettings }) {
       <div className="container header-inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
           <span className="brand-mark" aria-hidden="true">
-            {settings.siteTitle.slice(0, 1)}
+            <Image
+              src="/smmm.png"
+              alt=""
+              width={40}
+              height={40}
+              className="brand-logo"
+              priority
+            />
           </span>
           <span className="brand-text">{settings.siteTitle}</span>
         </Link>
