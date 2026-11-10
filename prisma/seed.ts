@@ -16,6 +16,27 @@ async function main() {
     },
   });
 
+  const aboutDefaults = {
+    aboutIntro:
+      "Kutlu Mali Müşavirlik, işletmelerin vergi ve muhasebe süreçlerini düzenli, anlaşılır ve denetlenebilir şekilde yönetmesi için kurulmuş bir mali müşavirlik ofisidir.",
+    aboutApproachTitle: "Çalışma yaklaşımımız",
+    aboutApproachText:
+      "Her müşteriye aynı standart kaliteyi sunarız: net iletişim, zamanında teslim ve belgelenmiş süreçler. Amacımız yalnızca beyanları tamamlamak değil, işletmenizin mali kararlarını daha sağlam temellere oturtmaktır.",
+    aboutScopeTitle: "Kimlerle çalışıyoruz",
+    aboutScopeText:
+      "Limited şirketler, anonim şirketler, şahıs işletmeleri ve serbest meslek sahipleriyle çalışıyoruz. Sektör fark etmeksizin ortak ihtiyacınız düzen ve güvenilir danışmanlıktır.",
+    aboutPromiseTitle: "Ne vaat ediyoruz",
+    aboutPromiseText:
+      "Kaçırılmayan tarihler, anlaşılır raporlar ve ihtiyaç anında hızlı dönüş. Büyürken yanınızda duran bir mali iş ortağı olmayı hedefleriz.",
+    contactHeroTitle: "Birlikte planlayalım",
+    contactHeroText:
+      "Kutlu Mali Müşavirlik ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.",
+    contactEmail: "info@ornek-mm.com",
+    contactPhone: "+90 (212) 000 00 00",
+    contactAddress: "İstanbul, Türkiye",
+    contactHours: "Hafta içi 09:00 – 18:00",
+  };
+
   await prisma.setting.upsert({
     where: { id: "main" },
     update: {
@@ -25,6 +46,7 @@ async function main() {
       whatsapp: "https://wa.me/905550000000",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
       externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
+      ...aboutDefaults,
     },
     create: {
       id: "main",
@@ -37,6 +59,7 @@ async function main() {
       whatsapp: "https://wa.me/905550000000",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
       externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
+      ...aboutDefaults,
     },
   });
 

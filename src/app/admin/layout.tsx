@@ -20,6 +20,9 @@ export default async function AdminLayout({
         <nav className="admin-nav">
           <Link href="/admin">Özet</Link>
           <Link href="/admin/blog">Blog Yazıları</Link>
+          <Link href="/admin/blog/yeni">Yeni Blog Yazısı</Link>
+          <Link href="/admin/hakkimizda">Hakkımızda</Link>
+          <Link href="/admin/iletisim">İletişim</Link>
           <Link href="/admin/mesajlar">Mesajlar</Link>
           <Link href="/admin/ayarlar">Ayarlar</Link>
           <Link href="/" target="_blank">

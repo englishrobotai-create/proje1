@@ -27,9 +27,9 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
         </div>
         <div>
           <p className="footer-heading">İletişim</p>
-          <p className="footer-text">info@ornek-mm.com</p>
-          <p className="footer-text">+90 (212) 000 00 00</p>
-          <p className="footer-text">İstanbul, Türkiye</p>
+          <p className="footer-text">{settings.contactEmail}</p>
+          <p className="footer-text">{settings.contactPhone}</p>
+          <p className="footer-text">{settings.contactAddress}</p>
           <Link href="/iletisim" className="footer-cta">
             Görüşme talep edin →
           </Link>

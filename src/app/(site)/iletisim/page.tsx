@@ -8,14 +8,14 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const { siteTitle } = await getSiteSettings();
+  const settings = await getSiteSettings();
 
   return (
     <>
       <PageHero
         kicker="İletişim"
-        title="Birlikte planlayalım"
-        description={`${siteTitle} ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.`}
+        title={settings.contactHeroTitle}
+        description={settings.contactHeroText}
       />
       <section className="section">
         <div className="container contact-layout">
@@ -27,19 +27,19 @@ export default async function ContactPage() {
             <h2 className="panel-title">Ofis bilgileri</h2>
             <div className="contact-detail">
               <span>E-posta</span>
-              <strong>info@ornek-mm.com</strong>
+              <strong>{settings.contactEmail}</strong>
             </div>
             <div className="contact-detail">
               <span>Telefon</span>
-              <strong>+90 (212) 000 00 00</strong>
+              <strong>{settings.contactPhone}</strong>
             </div>
             <div className="contact-detail">
               <span>Adres</span>
-              <strong>İstanbul, Türkiye</strong>
+              <strong>{settings.contactAddress}</strong>
             </div>
             <div className="contact-detail">
               <span>Çalışma saatleri</span>
-              <strong>Hafta içi 09:00 – 18:00</strong>
+              <strong>{settings.contactHours}</strong>
             </div>
           </aside>
         </div>
