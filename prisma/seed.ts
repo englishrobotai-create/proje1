@@ -16,9 +16,11 @@ async function main() {
     },
   });
 
+  const siteTitle = "SMMM Ramazan Arslantaş";
+
   const aboutDefaults = {
     aboutIntro:
-      "Kutlu Mali Müşavirlik, işletmelerin vergi ve muhasebe süreçlerini düzenli, anlaşılır ve denetlenebilir şekilde yönetmesi için kurulmuş bir mali müşavirlik ofisidir.",
+      "SMMM Ramazan Arslantaş, işletmelerin vergi ve muhasebe süreçlerini düzenli, anlaşılır ve denetlenebilir şekilde yönetmesi için kurulmuş bir mali müşavirlik ofisidir.",
     aboutApproachTitle: "Çalışma yaklaşımımız",
     aboutApproachText:
       "Her müşteriye aynı standart kaliteyi sunarız: net iletişim, zamanında teslim ve belgelenmiş süreçler. Amacımız yalnızca beyanları tamamlamak değil, işletmenizin mali kararlarını daha sağlam temellere oturtmaktır.",
@@ -30,7 +32,7 @@ async function main() {
       "Kaçırılmayan tarihler, anlaşılır raporlar ve ihtiyaç anında hızlı dönüş. Büyürken yanınızda duran bir mali iş ortağı olmayı hedefleriz.",
     contactHeroTitle: "Birlikte planlayalım",
     contactHeroText:
-      "Kutlu Mali Müşavirlik ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.",
+      "SMMM Ramazan Arslantaş ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.",
     contactEmail: "info@ornek-mm.com",
     contactPhone: "+90 (212) 000 00 00",
     contactAddress: "İstanbul, Türkiye",
@@ -40,6 +42,7 @@ async function main() {
   await prisma.setting.upsert({
     where: { id: "main" },
     update: {
+      siteTitle,
       facebook: "https://facebook.com/",
       instagram: "https://instagram.com/",
       linkedin: "https://linkedin.com/",
@@ -50,7 +53,7 @@ async function main() {
     },
     create: {
       id: "main",
-      siteTitle: "Kutlu Mali Müşavirlik",
+      siteTitle,
       facebook: "https://facebook.com/",
       instagram: "https://instagram.com/",
       linkedin: "https://linkedin.com/",

@@ -42,7 +42,7 @@ const defaults = {
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const setting = await prisma.setting.findUnique({ where: { id: "main" } });
-  const siteTitle = setting?.siteTitle ?? "Mali Müşavirlik";
+  const siteTitle = setting?.siteTitle ?? "SMMM Ramazan Arslantaş";
 
   return {
     siteTitle,
