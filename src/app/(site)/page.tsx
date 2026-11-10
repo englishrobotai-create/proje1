@@ -144,6 +144,40 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section band-section">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="section-kicker">Blog</p>
+              <h2 className="section-title">Blog yazılarımız</h2>
+            </div>
+            <Link href="/blog" className="btn btn-secondary">
+              Tüm yazılar
+            </Link>
+          </div>
+          <div className="post-grid">
+            {posts.length === 0 ? (
+              <article className="post-item">
+                <h3>Henüz yazı yok</h3>
+                <p>Admin panelinden ilk blog yazınızı ekleyebilirsiniz.</p>
+              </article>
+            ) : (
+              posts.map((post) => (
+                <article key={post.id} className="post-item">
+                  <span className="post-meta">
+                    {post.createdAt.toLocaleDateString("tr-TR")}
+                  </span>
+                  <h3>
+                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  </h3>
+                  <p>{post.excerpt}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
       <section className="section band-section" id="hesaplamalar">
         <div className="container">
           <div className="section-head">
@@ -177,40 +211,6 @@ export default async function HomePage() {
                 <span>{tool.description}</span>
               </a>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section band-section">
-        <div className="container">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Blog</p>
-              <h2 className="section-title">Blog yazılarımız</h2>
-            </div>
-            <Link href="/blog" className="btn btn-secondary">
-              Tüm yazılar
-            </Link>
-          </div>
-          <div className="post-grid">
-            {posts.length === 0 ? (
-              <article className="post-item">
-                <h3>Henüz yazı yok</h3>
-                <p>Admin panelinden ilk blog yazınızı ekleyebilirsiniz.</p>
-              </article>
-            ) : (
-              posts.map((post) => (
-                <article key={post.id} className="post-item">
-                  <span className="post-meta">
-                    {post.createdAt.toLocaleDateString("tr-TR")}
-                  </span>
-                  <h3>
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                  </h3>
-                  <p>{post.excerpt}</p>
-                </article>
-              ))
-            )}
           </div>
         </div>
       </section>
