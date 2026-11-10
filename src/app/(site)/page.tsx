@@ -34,7 +34,6 @@ export default async function HomePage() {
         <div className="hero-orb hero-orb-b" aria-hidden="true" />
         <div className="container hero-shell">
           <div className="hero-content">
-            <p className="hero-brand">{settings.siteTitle}</p>
             <h1 className="hero-title">
               Vergi ve muhasebede net, güvenilir rehberlik
             </h1>
