@@ -920,42 +920,50 @@ img {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.home-link-groups {
+.calculator-grid {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.home-link-group h3 {
-  margin: 0 0 0.85rem;
+.calculator-card {
+  display: grid;
+  gap: 0.45rem;
+  min-height: 150px;
+  padding: 1.35rem;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 252, 0.9));
+  border: 1px solid rgba(210, 222, 231, 0.95);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.calculator-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(184, 146, 63, 0.5);
+  box-shadow: var(--shadow-strong);
+}
+
+.calculator-card strong {
   font-family: var(--font-display), serif;
-  color: var(--brand-deep);
   font-size: 1.25rem;
-}
-
-.home-link-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.link-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #fff, #f2f7fa);
-  border: 1px solid var(--line);
   color: var(--brand-deep);
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  line-height: 1.25;
 }
 
-.link-chip:hover {
-  transform: translateY(-2px);
-  border-color: rgba(184, 146, 63, 0.55);
-  background: #fff8ea;
-  box-shadow: 0 10px 20px rgba(7, 38, 47, 0.08);
+.calculator-card span {
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+
+.calculator-card em {
+  margin-top: auto;
+  font-style: normal;
+  color: #8a7040;
+  font-weight: 700;
+  font-size: 0.88rem;
 }
 
 .news-grid {
@@ -1625,6 +1633,7 @@ textarea:focus {
   .stats,
   .admin-shell,
   .useful-link-grid,
+  .calculator-grid,
   .news-grid,
   .mini-link-grid {
     grid-template-columns: 1fr;

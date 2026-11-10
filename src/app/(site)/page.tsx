@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { MaliGelismelerSlider } from "@/components/MaliGelismelerSlider";
-import {
-  usefulLinkCount,
-  usefulLinkGroups,
-} from "@/data/useful-links";
+import { calculatorLinks } from "@/data/calculators";
 import { prisma } from "@/lib/db";
 import { fetchExternalNews } from "@/lib/external-news";
 import { getSiteSettings } from "@/lib/settings";
@@ -162,41 +159,39 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section band-section" id="yararli-linkler">
+      <section className="section band-section" id="hesaplamalar">
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="section-kicker">Kaynaklar</p>
-              <h2 className="section-title">Yararlı linkler</h2>
+              <p className="section-kicker">Hesaplama araçları</p>
+              <h2 className="section-title">Pratik mali hesaplamalar</h2>
               <p className="section-lead">
-                GİB, SGK, e-Devlet ve meslek odaları dahil {usefulLinkCount}{" "}
-                sık kullanılan kaynağa ana sayfadan erişin.
+                Bordro, kıdem, IFRS ve vergi hesaplamalarına hızlı erişim.
               </p>
             </div>
-            <Link href="/yararli-linkler" className="btn btn-primary">
-              Ayrı sayfada aç
-            </Link>
+            <a
+              href="https://www.ozcankutlu.com/tr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
+              Tüm araçlar
+            </a>
           </div>
 
-          <div className="home-link-groups">
-            {usefulLinkGroups.map((group) => (
-              <div key={group.category} className="home-link-group">
-                <h3>{group.category}</h3>
-                <div className="home-link-chips">
-                  {group.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-chip"
-                      title={link.description}
-                    >
-                      {link.title}
-                    </a>
-                  ))}
-                </div>
-              </div>
+          <div className="calculator-grid">
+            {calculatorLinks.map((tool) => (
+              <a
+                key={tool.href}
+                href={tool.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="calculator-card"
+              >
+                <strong>{tool.title}</strong>
+                <span>{tool.description}</span>
+                <em>Hesaplamaya git →</em>
+              </a>
             ))}
           </div>
         </div>
