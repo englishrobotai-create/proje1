@@ -10,7 +10,6 @@ const links = [
   { href: "/hakkimizda", label: "Hakkımızda" },
   { href: "/hizmetler", label: "Hizmetler" },
   { href: "/blog", label: "Blog" },
-  { href: "/yararli-linkler", label: "Yararlı Linkler" },
   { href: "/iletisim", label: "İletişim" },
 ];
 
