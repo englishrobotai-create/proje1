@@ -21,7 +21,7 @@ export default async function AdminLayout({
           <Link href="/admin">Özet</Link>
           <Link href="/admin/blog">Blog Yazıları</Link>
           <Link href="/admin/mesajlar">Mesajlar</Link>
-          <Link href="/admin/ayarlar">Site Başlığı</Link>
+          <Link href="/admin/ayarlar">Ayarlar</Link>
           <Link href="/" target="_blank">
             Siteyi Gör
           </Link>

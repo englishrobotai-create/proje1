@@ -2,11 +2,12 @@
 
 ## Çalışıyor
 
-- Public sayfalar
+- Public sayfalar + mobil menü
 - Admin giriş / çıkış
 - Blog CRUD
-- Site başlığı güncelleme
+- Site başlığı + sosyal medya ayarları
 - İletişim formu + mesaj listesi
+- Yararlı linkler (38 adet)
 - Seed admin: admin@ornek.com / Admin123!
 
 ## Sonraki olası adımlar

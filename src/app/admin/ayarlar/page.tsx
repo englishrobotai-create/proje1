@@ -12,10 +12,10 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <div className="admin-top">
-        <h2>Site Başlığı</h2>
+        <h2>Site Ayarları</h2>
       </div>
-      <div className="admin-panel" style={{ maxWidth: 560 }}>
-        <SettingsForm siteTitle={settings.siteTitle} />
+      <div className="admin-panel" style={{ maxWidth: 760 }}>
+        <SettingsForm settings={settings} />
       </div>
     </>
   );

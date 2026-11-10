@@ -18,6 +18,12 @@ model User {
 model Setting {
   id        String   @id @default("main")
   siteTitle String
+  facebook  String   @default("")
+  instagram String   @default("")
+  linkedin  String   @default("")
+  twitter   String   @default("")
+  youtube   String   @default("")
+  whatsapp  String   @default("")
   updatedAt DateTime @updatedAt
 }
 

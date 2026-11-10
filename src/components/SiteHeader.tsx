@@ -1,19 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import type { SiteSettings } from "@/lib/settings";
+import { SocialLinks } from "./SocialLinks";
 
 const links = [
   { href: "/", label: "Ana Sayfa" },
   { href: "/hakkimizda", label: "Hakkımızda" },
   { href: "/hizmetler", label: "Hizmetler" },
   { href: "/blog", label: "Blog" },
+  { href: "/yararli-linkler", label: "Yararlı Linkler" },
   { href: "/iletisim", label: "İletişim" },
 ];
 
-export function SiteHeader({ siteTitle }: { siteTitle: string }) {
+export function SiteHeader({ settings }: { settings: SiteSettings }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link href="/" className="brand">
-          {siteTitle}
+        <Link href="/" className="brand" onClick={() => setOpen(false)}>
+          {settings.siteTitle}
         </Link>
         <nav className="nav" aria-label="Ana menü">
           {links.map((link) => (
@@ -22,10 +30,39 @@ export function SiteHeader({ siteTitle }: { siteTitle: string }) {
             </Link>
           ))}
         </nav>
-        <Link href="/iletisim" className="btn btn-primary header-cta">
-          Randevu Alın
-        </Link>
+        <div className="header-right">
+          <SocialLinks settings={settings} />
+          <Link href="/iletisim" className="btn btn-primary header-cta">
+            Randevu Alın
+          </Link>
+          <button
+            type="button"
+            className="menu-toggle"
+            aria-expanded={open}
+            aria-label="Menüyü aç"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
+      {open ? (
+        <div className="mobile-menu container">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="mobile-link"
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <SocialLinks settings={settings} />
+        </div>
+      ) : null}
     </header>
   );
 }

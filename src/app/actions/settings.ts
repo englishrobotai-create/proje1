@@ -5,12 +5,27 @@ import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+const optionalUrl = z
+  .string()
+  .trim()
+  .max(300)
+  .refine(
+    (value) => value === "" || /^https?:\/\//i.test(value),
+    "Bağlantı http:// veya https:// ile başlamalı",
+  );
+
 const schema = z.object({
   siteTitle: z
     .string()
     .trim()
     .min(2, "Başlık en az 2 karakter olmalı")
     .max(80, "Başlık en fazla 80 karakter olabilir"),
+  facebook: optionalUrl,
+  instagram: optionalUrl,
+  linkedin: optionalUrl,
+  twitter: optionalUrl,
+  youtube: optionalUrl,
+  whatsapp: optionalUrl,
 });
 
 export type SettingsState = {
@@ -18,7 +33,7 @@ export type SettingsState = {
   success?: string;
 };
 
-export async function updateSiteTitleAction(
+export async function updateSettingsAction(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
@@ -30,6 +45,12 @@ export async function updateSiteTitleAction(
 
   const parsed = schema.safeParse({
     siteTitle: formData.get("siteTitle"),
+    facebook: formData.get("facebook") ?? "",
+    instagram: formData.get("instagram") ?? "",
+    linkedin: formData.get("linkedin") ?? "",
+    twitter: formData.get("twitter") ?? "",
+    youtube: formData.get("youtube") ?? "",
+    whatsapp: formData.get("whatsapp") ?? "",
   });
 
   if (!parsed.success) {
@@ -38,13 +59,13 @@ export async function updateSiteTitleAction(
 
   await prisma.setting.upsert({
     where: { id: "main" },
-    update: { siteTitle: parsed.data.siteTitle },
-    create: { id: "main", siteTitle: parsed.data.siteTitle },
+    update: parsed.data,
+    create: { id: "main", ...parsed.data },
   });
 
   revalidatePath("/", "layout");
   revalidatePath("/admin");
   revalidatePath("/admin/ayarlar");
 
-  return { success: "Site başlığı güncellendi" };
+  return { success: "Ayarlar kaydedildi" };
 }

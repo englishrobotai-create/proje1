@@ -18,10 +18,21 @@ async function main() {
 
   await prisma.setting.upsert({
     where: { id: "main" },
-    update: {},
+    update: {
+      facebook: "https://facebook.com/",
+      instagram: "https://instagram.com/",
+      linkedin: "https://linkedin.com/",
+      whatsapp: "https://wa.me/905550000000",
+    },
     create: {
       id: "main",
       siteTitle: "Kutlu Mali Müşavirlik",
+      facebook: "https://facebook.com/",
+      instagram: "https://instagram.com/",
+      linkedin: "https://linkedin.com/",
+      twitter: "",
+      youtube: "",
+      whatsapp: "https://wa.me/905550000000",
     },
   });
 

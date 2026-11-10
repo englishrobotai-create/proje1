@@ -1,67 +1,147 @@
 import Link from "next/link";
+import { SocialLinks } from "@/components/SocialLinks";
+import {
+  usefulLinkCount,
+  usefulLinkGroups,
+} from "@/data/useful-links";
 import { prisma } from "@/lib/db";
 import { getSiteSettings } from "@/lib/settings";
 
 export default async function HomePage() {
-  const { siteTitle } = await getSiteSettings();
+  const settings = await getSiteSettings();
   const posts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
     take: 2,
   });
 
+  const previewLinks = usefulLinkGroups
+    .flatMap((group) => group.links)
+    .slice(0, 6);
+
   return (
     <>
       <section className="hero">
-        <div className="container hero-content">
-          <p className="hero-brand">{siteTitle}</p>
-          <h1 className="hero-title">
-            Vergi ve muhasebede net, güvenilir rehberlik
-          </h1>
-          <p className="hero-text">
-            Şirketinizin yükümlülüklerini zamanında yönetir, kararlarınızı
-            mali görünürlükle güçlendiririz.
-          </p>
-          <div className="hero-actions">
-            <Link href="/iletisim" className="btn btn-primary">
-              Ücretsiz Ön Görüşme
-            </Link>
-            <Link href="/hizmetler" className="btn btn-secondary">
-              Hizmetleri İncele
-            </Link>
+        <div className="hero-orb hero-orb-a" aria-hidden="true" />
+        <div className="hero-orb hero-orb-b" aria-hidden="true" />
+        <div className="container hero-shell">
+          <div className="hero-content">
+            <p className="hero-brand">{settings.siteTitle}</p>
+            <h1 className="hero-title">
+              Vergi ve muhasebede net, güvenilir rehberlik
+            </h1>
+            <p className="hero-text">
+              Şirketinizin yükümlülüklerini zamanında yönetir, kararlarınızı
+              mali görünürlükle güçlendiririz.
+            </p>
+            <div className="hero-actions">
+              <Link href="/iletisim" className="btn btn-primary">
+                Ücretsiz Ön Görüşme
+              </Link>
+              <Link href="/hizmetler" className="btn btn-ghost">
+                Hizmetleri İncele
+              </Link>
+            </div>
+            <SocialLinks settings={settings} variant="hero" />
+          </div>
+          <div className="hero-panel" aria-hidden="true">
+            <div className="hero-panel-glow" />
+            <div className="metric-card metric-a">
+              <span>Beyan takibi</span>
+              <strong>Zamanında</strong>
+            </div>
+            <div className="metric-card metric-b">
+              <span>Raporlama</span>
+              <strong>Şeffaf</strong>
+            </div>
+            <div className="metric-card metric-c">
+              <span>Danışmanlık</span>
+              <strong>Kurumsal</strong>
+            </div>
+            <svg className="hero-chart" viewBox="0 0 320 180" fill="none">
+              <path
+                d="M20 140 C70 130, 90 90, 130 95 S190 130, 230 70 S280 40, 300 35"
+                stroke="rgba(196,163,90,0.9)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M20 150 C80 145, 110 120, 150 118 S210 140, 250 100 S290 80, 300 78"
+                stroke="rgba(255,255,255,0.35)"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="300" cy="35" r="5" fill="#c4a35a" />
+            </svg>
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <p className="section-kicker">Neden biz</p>
-          <h2 className="section-title">Kurumsal disiplin, sade iletişim</h2>
+      <section className="section band-section">
+        <div className="container trust-band">
+          <div>
+            <p className="section-kicker">Güven odaklı</p>
+            <h2 className="section-title">Kurumsal disiplin, sade iletişim</h2>
+          </div>
           <p className="section-lead">
-            Standart süreçlerimizle beyan, bordro ve danışmanlık işlerinizi
-            tek çatı altında takip ederiz.
+            Standart süreçlerimizle beyan, bordro ve danışmanlık işlerinizi tek
+            çatı altında takip ederiz.
           </p>
-          <div className="feature-grid">
-            <article className="feature-item">
-              <h3>Zamanında beyan</h3>
-              <p>
-                Vergi takvimini kaçırmadan yönetir, riskleri erken
-                görünür kılarız.
-              </p>
-            </article>
-            <article className="feature-item">
-              <h3>Şeffaf raporlama</h3>
-              <p>
-                Dönemsel özetlerle nakit akışı ve yükümlülüklerinizi net
-                takip edersiniz.
-              </p>
-            </article>
-            <article className="feature-item">
-              <h3>Büyüme odaklı danışmanlık</h3>
-              <p>
-                Kuruluştan ölçeklenmeye kadar doğru yapılandırma için yanınızdayız.
-              </p>
-            </article>
+        </div>
+        <div className="container feature-grid">
+          <article className="feature-item reveal">
+            <div className="feature-icon">01</div>
+            <h3>Zamanında beyan</h3>
+            <p>
+              Vergi takvimini kaçırmadan yönetir, riskleri erken görünür
+              kılarız.
+            </p>
+          </article>
+          <article className="feature-item reveal delay-1">
+            <div className="feature-icon">02</div>
+            <h3>Şeffaf raporlama</h3>
+            <p>
+              Dönemsel özetlerle nakit akışı ve yükümlülüklerinizi net takip
+              edersiniz.
+            </p>
+          </article>
+          <article className="feature-item reveal delay-2">
+            <div className="feature-icon">03</div>
+            <h3>Büyüme odaklı danışmanlık</h3>
+            <p>
+              Kuruluştan ölçeklenmeye kadar doğru yapılandırma için
+              yanınızdayız.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container section-split">
+          <div>
+            <p className="section-kicker">Kaynaklar</p>
+            <h2 className="section-title">Yararlı linkler</h2>
+            <p className="section-lead">
+              GİB, SGK, e-Devlet ve meslek odaları dahil {usefulLinkCount}{" "}
+              sık kullanılan kaynağa hızlı erişim.
+            </p>
+            <Link href="/yararli-linkler" className="btn btn-primary">
+              Tüm linkleri gör
+            </Link>
+          </div>
+          <div className="mini-link-grid">
+            {previewLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mini-link"
+              >
+                <strong>{link.title}</strong>
+                <span>{link.description}</span>
+              </a>
+            ))}
           </div>
         </div>
       </section>

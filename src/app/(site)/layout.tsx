@@ -7,13 +7,13 @@ export default async function SiteLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { siteTitle } = await getSiteSettings();
+  const settings = await getSiteSettings();
 
   return (
     <div className="min-h-full flex flex-col">
-      <SiteHeader siteTitle={siteTitle} />
+      <SiteHeader settings={settings} />
       <main className="flex-1">{children}</main>
-      <SiteFooter siteTitle={siteTitle} />
+      <SiteFooter settings={settings} />
     </div>
   );
 }

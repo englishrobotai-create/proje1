@@ -41,8 +41,8 @@ export default async function AdminDashboardPage() {
       </div>
       <div className="admin-panel">
         <p style={{ margin: 0, color: "var(--ink-soft)" }}>
-          Soldaki menüden blog yazılarını yönetebilir, site başlığını
-          değiştirebilir ve iletişim formundan gelen mesajları
+          Soldaki menüden blog yazılarını, site başlığını, sosyal medya
+          bağlantılarını yönetebilir ve iletişim formundan gelen mesajları
           inceleyebilirsiniz.
         </p>
       </div>
