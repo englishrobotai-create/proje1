@@ -537,6 +537,249 @@ img {
   margin-bottom: 1.5rem;
 }
 
+.mg-wrap {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.mg-section {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.mg-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.mg-header h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+  color: #1f3a45;
+}
+
+.mg-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: livePulse 1.8s ease-out infinite;
+}
+
+.mg-live-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #34d399;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.mg-slider {
+  position: relative;
+}
+
+.mg-card-link {
+  display: block;
+  color: inherit;
+}
+
+.mg-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 210px;
+  border-radius: 22px;
+  padding: 1.4rem 1.5rem;
+  color: white;
+  box-shadow: 0 18px 40px rgba(90, 24, 24, 0.22);
+}
+
+.mg-card.theme-crimson {
+  background: linear-gradient(115deg, #5a1c1c 0%, #8b2e2e 42%, #c24545 100%);
+}
+
+.mg-card.theme-navy,
+.mg-card.theme-blue {
+  background: linear-gradient(115deg, #0b2a3d 0%, #164860 45%, #2a6f8f 100%);
+}
+
+.mg-card.theme-emerald,
+.mg-card.theme-green {
+  background: linear-gradient(115deg, #0f3b2e 0%, #1b6b52 45%, #2f9b74 100%);
+}
+
+.mg-card.theme-amber,
+.mg-card.theme-gold {
+  background: linear-gradient(115deg, #5a3b12 0%, #8a5a18 45%, #c4922e 100%);
+}
+
+.mg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.mg-content {
+  position: relative;
+  z-index: 2;
+  max-width: 78%;
+}
+
+.mg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(232, 201, 126, 0.95);
+  color: #4a3410;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.mg-badge-icon,
+.mg-meta-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.mg-content h3 {
+  margin: 0.9rem 0 0.55rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.mg-content p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+.mg-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.2rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+}
+
+.mg-decor {
+  position: absolute;
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 120px;
+  height: 120px;
+  opacity: 0.18;
+  color: white;
+  z-index: 1;
+}
+
+.mg-decor svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mg-decor span {
+  position: absolute;
+  right: 10px;
+  bottom: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid white;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.mg-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(20, 30, 40, 0.72);
+  color: white;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mg-prev {
+  left: 0.55rem;
+}
+
+.mg-next {
+  right: 0.55rem;
+}
+
+.mg-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.15rem;
+}
+
+.mg-dots button {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #c5d5df;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mg-dots button.is-active {
+  width: 22px;
+  background: #1f3a45;
+}
+
+.mg-source-note {
+  margin: 0;
+  text-align: center;
+  color: #7a8795;
+  font-size: 0.82rem;
+}
+
+.mg-source-note a {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
 .home-services {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

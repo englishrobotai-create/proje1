@@ -31,18 +31,18 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         Bu başlık sitenin logosunda, sekme başlığında ve alt bilgide görünür.
       </p>
 
-      <h3 className="admin-subtitle">Güncel haber kaynağı</h3>
+      <h3 className="admin-subtitle">Güncel mali gelişmeler</h3>
       <p className="form-hint">
-        Ana sayfadaki güncel haberler bu adresten otomatik çekilir. Varsayılan:
-        ozcankutlu.com blog.
+        Ana sayfadaki CANLI kaydırıcı bu JSON API’den beslenir. Varsayılan:
+        ozcankutlu.com/api/news
       </p>
       <div className="form-row">
         <label>
-          Haber kaynağı URL
+          API URL
           <input
             name="externalNewsUrl"
             type="url"
-            placeholder="https://www.ozcankutlu.com/tr/blog"
+            placeholder="https://www.ozcankutlu.com/api/news"
             defaultValue={settings.externalNewsUrl}
           />
         </label>
@@ -51,7 +51,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <input
             name="externalNewsLabel"
             maxLength={80}
-            placeholder="Özcan Kutlu Blog"
+            placeholder="Özcan Kutlu — Güncel Mali Gelişmeler"
             defaultValue={settings.externalNewsLabel}
           />
         </label>

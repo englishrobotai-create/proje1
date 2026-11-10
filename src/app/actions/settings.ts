@@ -64,8 +64,10 @@ export async function updateSettingsAction(
   const data = {
     ...parsed.data,
     externalNewsUrl:
-      parsed.data.externalNewsUrl || "https://www.ozcankutlu.com/tr/blog",
-    externalNewsLabel: parsed.data.externalNewsLabel || "Özcan Kutlu Blog",
+      parsed.data.externalNewsUrl || "https://www.ozcankutlu.com/api/news",
+    externalNewsLabel:
+      parsed.data.externalNewsLabel ||
+      "Özcan Kutlu — Güncel Mali Gelişmeler",
   };
 
   await prisma.setting.upsert({

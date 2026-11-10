@@ -24,7 +24,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     youtube: setting?.youtube ?? "",
     whatsapp: setting?.whatsapp ?? "",
     externalNewsUrl: setting?.externalNewsUrl || DEFAULT_NEWS_URL,
-    externalNewsLabel: setting?.externalNewsLabel || "Özcan Kutlu Blog",
+    externalNewsLabel:
+      setting?.externalNewsLabel || "Özcan Kutlu — Güncel Mali Gelişmeler",
   };
 }
 

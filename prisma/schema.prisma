@@ -24,8 +24,8 @@ model Setting {
   twitter          String   @default("")
   youtube          String   @default("")
   whatsapp         String   @default("")
-  externalNewsUrl  String   @default("https://www.ozcankutlu.com/tr/blog")
-  externalNewsLabel String  @default("Özcan Kutlu Blog")
+  externalNewsUrl  String   @default("https://www.ozcankutlu.com/api/news")
+  externalNewsLabel String  @default("Özcan Kutlu — Güncel Mali Gelişmeler")
   updatedAt        DateTime @updatedAt
 }
 

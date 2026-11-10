@@ -1,97 +1,92 @@
 export type ExternalNewsItem = {
+  id: string;
   title: string;
-  href: string;
-  excerpt: string;
+  summary: string;
   dateLabel: string;
+  source: string;
+  href: string;
+  kind: string;
+  theme: string;
+  badge: string;
 };
 
-const DEFAULT_NEWS_URL = "https://www.ozcankutlu.com/tr/blog";
+const DEFAULT_NEWS_URL = "https://www.ozcankutlu.com/api/news";
 
-function decodeHtml(value: string) {
-  return value
-    .replace(/&#x27;/gi, "'")
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+type ApiNewsItem = {
+  id?: string;
+  title?: string;
+  summary?: string;
+  analysis?: string;
+  primarySource?: string;
+  primaryUrl?: string;
+  effectiveDate?: string;
+  publishedAt?: string;
+  kind?: string;
+  visualTheme?: string;
+  disableSourceLink?: boolean;
+  sources?: Array<{ name?: string; url?: string }>;
+};
+
+type ApiNewsResponse = {
+  success?: boolean;
+  data?: ApiNewsItem[];
+};
+
+function formatDateLabel(value?: string) {
+  if (!value) return "";
+  const date = new Date(value.includes("T") ? value : `${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-function absoluteUrl(base: string, path: string) {
-  try {
-    return new URL(path, base).toString();
-  } catch {
-    return path;
-  }
+function badgeFor(kind?: string) {
+  if (kind === "deadline") return "SON TARİH";
+  if (kind === "alert") return "UYARI";
+  return "GÜNCEL";
 }
 
 export async function fetchExternalNews(
   sourceUrl = DEFAULT_NEWS_URL,
-  limit = 9,
+  limit = 20,
 ): Promise<ExternalNewsItem[]> {
   const url = sourceUrl.trim() || DEFAULT_NEWS_URL;
 
   try {
     const response = await fetch(url, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 1800 },
       headers: {
+        Accept: "application/json",
         "User-Agent": "Proje1NewsBot/1.0",
-        Accept: "text/html",
       },
     });
 
     if (!response.ok) return [];
 
-    const html = await response.text();
-    const cardRegex =
-      /<a class="group block h-full" href="([^"]+)">([\s\S]*?)<\/article><\/a>/g;
-    const items: ExternalNewsItem[] = [];
-    let match: RegExpExecArray | null;
+    const payload = (await response.json()) as ApiNewsResponse;
+    const rows = Array.isArray(payload.data) ? payload.data : [];
 
-    while ((match = cardRegex.exec(html)) !== null && items.length < limit) {
-      const href = absoluteUrl(url, match[1]);
-      const block = match[2];
-      const titleMatch = block.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
-      const excerptMatch =
-        block.match(/<p class="[^"]*line-clamp[^"]*"[^>]*>([\s\S]*?)<\/p>/i) ||
-        block.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
-      const dateMatch = block.match(
-        /(\d{1,2}\s+[A-Za-zçğıöşüÇĞİÖŞÜ]+\s+\d{4})/,
-      );
+    return rows.slice(0, limit).map((item, index) => {
+      const href =
+        item.disableSourceLink
+          ? ""
+          : item.primaryUrl || item.sources?.[0]?.url || "";
 
-      const title = titleMatch ? decodeHtml(titleMatch[1]) : "";
-      if (!title) continue;
-
-      items.push({
-        title,
+      return {
+        id: item.id || `news-${index}`,
+        title: item.title?.trim() || "Güncel mali gelişme",
+        summary: (item.summary || item.analysis || "").trim(),
+        dateLabel: formatDateLabel(item.effectiveDate || item.publishedAt),
+        source: item.primarySource || item.sources?.[0]?.name || "Resmi kaynak",
         href,
-        excerpt: excerptMatch ? decodeHtml(excerptMatch[1]) : "",
-        dateLabel: dateMatch?.[1] ?? "",
-      });
-    }
-
-    if (items.length > 0) return items;
-
-    // Fallback: collect blog links from sitemap-style anchors
-    const linkRegex = /href="((?:https?:\/\/[^"]+)?\/tr\/blog\/[^"]+)"/g;
-    const seen = new Set<string>();
-    while ((match = linkRegex.exec(html)) !== null && items.length < limit) {
-      const href = absoluteUrl(url, match[1]);
-      if (seen.has(href) || href.endsWith("/tr/blog")) continue;
-      seen.add(href);
-      const slug = href.split("/").pop()?.replace(/-/g, " ") ?? "Yazı";
-      items.push({
-        title: slug.replace(/\b\w/g, (c) => c.toUpperCase()),
-        href,
-        excerpt: "ozcankutlu.com blog yazısı",
-        dateLabel: "",
-      });
-    }
-
-    return items;
+        kind: item.kind || "news",
+        theme: item.visualTheme || "crimson",
+        badge: badgeFor(item.kind),
+      };
+    });
   } catch {
     return [];
   }

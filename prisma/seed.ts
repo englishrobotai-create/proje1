@@ -23,8 +23,8 @@ async function main() {
       instagram: "https://instagram.com/",
       linkedin: "https://linkedin.com/",
       whatsapp: "https://wa.me/905550000000",
-      externalNewsUrl: "https://www.ozcankutlu.com/tr/blog",
-      externalNewsLabel: "Özcan Kutlu Blog",
+      externalNewsUrl: "https://www.ozcankutlu.com/api/news",
+      externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
     },
     create: {
       id: "main",
@@ -35,8 +35,8 @@ async function main() {
       twitter: "",
       youtube: "",
       whatsapp: "https://wa.me/905550000000",
-      externalNewsUrl: "https://www.ozcankutlu.com/tr/blog",
-      externalNewsLabel: "Özcan Kutlu Blog",
+      externalNewsUrl: "https://www.ozcankutlu.com/api/news",
+      externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
     },
   });
 

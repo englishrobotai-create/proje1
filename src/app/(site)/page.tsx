@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MaliGelismelerSlider } from "@/components/MaliGelismelerSlider";
 import { SocialLinks } from "@/components/SocialLinks";
 import {
   usefulLinkCount,
@@ -8,7 +9,7 @@ import { prisma } from "@/lib/db";
 import { fetchExternalNews } from "@/lib/external-news";
 import { getSiteSettings } from "@/lib/settings";
 
-export const revalidate = 3600;
+export const revalidate = 1800;
 
 const homeServices = [
   {
@@ -37,7 +38,7 @@ export default async function HomePage() {
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
-    fetchExternalNews(settings.externalNewsUrl, 9),
+    fetchExternalNews(settings.externalNewsUrl, 20),
   ]);
 
   return (
@@ -95,6 +96,16 @@ export default async function HomePage() {
               <circle cx="300" cy="35" r="5" fill="#c4a35a" />
             </svg>
           </div>
+        </div>
+      </section>
+
+      <section className="section mg-wrap">
+        <div className="container">
+          <MaliGelismelerSlider
+            items={externalNews}
+            sourceLabel={settings.externalNewsLabel}
+            sourceUrl={settings.externalNewsUrl}
+          />
         </div>
       </section>
 
@@ -196,57 +207,6 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Güncel</p>
-              <h2 className="section-title">Güncel haberler</h2>
-              <p className="section-lead">
-                {settings.externalNewsLabel} kaynağından otomatik güncellenen
-                yazılar.
-              </p>
-            </div>
-            <a
-              href={settings.externalNewsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
-              Kaynağa git
-            </a>
-          </div>
-
-          {externalNews.length === 0 ? (
-            <div className="admin-panel">
-              <p style={{ margin: 0 }}>
-                Haberler şu an yüklenemedi. Kaynak adresini admin ayarlarından
-                kontrol edin.
-              </p>
-            </div>
-          ) : (
-            <div className="news-grid">
-              {externalNews.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="news-card"
-                >
-                  {item.dateLabel ? (
-                    <span className="post-meta">{item.dateLabel}</span>
-                  ) : null}
-                  <strong>{item.title}</strong>
-                  {item.excerpt ? <span>{item.excerpt}</span> : null}
-                  <em>Devamını oku →</em>
-                </a>
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
