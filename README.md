@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Proje1 — Mali Müşavir Web Sitesi
 
-## Getting Started
+Ayrı kopya modeliyle satılmak üzere hazırlanmış Next.js mali müşavir sitesi.
 
-First, run the development server:
+## Özellikler
+
+- Kurumsal vitrin: Ana sayfa, Hakkımızda, Hizmetler, Blog, İletişim
+- Admin paneli (`/admin/giris`)
+- Blog yazısı ekleme / düzenleme / silme
+- Site başlığını değiştirme
+- İletişim formundan gelen mesajları panelde görme
+
+## Kurulum
 
 ```bash
+npm install
+cp .env.example .env
+npm run db:setup
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Site: [http://localhost:3000](http://localhost:3000)  
+Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Varsayılan giriş
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- E-posta: `admin@ornek.com`
+- Şifre: `Admin123!`
 
-## Learn More
+İlk kurulumdan sonra şifreyi değiştirin. `.env` içindeki `AUTH_SECRET` değerini de her müşteri kopyasında yenileyin.
 
-To learn more about Next.js, take a look at the following resources:
+## Müşteriye teslim (ayrı kopya)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Bu projeyi kopyalayın
+2. Yeni `.env` oluşturun
+3. `npm install` ve `npm run db:setup` çalıştırın
+4. Hostinge alın (`npm run build` + `npm run start`)
+5. Admin şifresini ve site başlığını müşteriyle güncelleyin
