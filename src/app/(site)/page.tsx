@@ -182,15 +182,15 @@ export default async function HomePage() {
           <div className="calculator-grid">
             {calculatorLinks.map((tool) => (
               <a
-                key={tool.href}
+                key={`${tool.href}-${tool.title}`}
                 href={tool.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="calculator-card"
+                className={`calculator-card tone-${tool.tone}`}
               >
                 <strong>{tool.title}</strong>
                 <span>{tool.description}</span>
-                <em>Hesaplamaya git →</em>
+                <em>Aç →</em>
               </a>
             ))}
           </div>
