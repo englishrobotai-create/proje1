@@ -60,17 +60,17 @@ export function SectionHeading({
 }) {
   return (
     <div className={`section-head section-heading section-heading-${variant}`}>
-      <div className="section-heading-copy">
-        <div className="section-heading-top">
-          <span className="section-heading-icon" aria-hidden="true">
-            {icons[variant]}
-          </span>
-          <p className="section-kicker section-heading-kicker">{kicker}</p>
+      <div className="section-heading-row">
+        <span className="section-heading-icon" aria-hidden="true">
+          {icons[variant]}
+        </span>
+        <div className="section-heading-text">
+          <span className="section-heading-kicker">{kicker}</span>
+          <h2 className="section-title section-heading-title">{title}</h2>
         </div>
-        <h2 className="section-title section-heading-title">{title}</h2>
-        {lead ? <p className="section-lead">{lead}</p> : null}
+        {lead ? <p className="section-lead section-heading-lead">{lead}</p> : null}
+        {action ? <div className="section-heading-action">{action}</div> : null}
       </div>
-      {action ? <div className="section-heading-action">{action}</div> : null}
     </div>
   );
 }

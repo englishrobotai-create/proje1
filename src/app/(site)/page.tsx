@@ -90,12 +90,6 @@ export default async function HomePage() {
             variant="trust"
             kicker="Güven odaklı"
             title="Kurumsal disiplin, sade iletişim"
-            action={
-              <p className="section-lead section-heading-side-lead">
-                Standart süreçlerimizle beyan, bordro ve danışmanlık işlerinizi
-                tek çatı altında takip ederiz.
-              </p>
-            }
           />
         </div>
         <div className="container feature-grid">
@@ -190,7 +184,6 @@ export default async function HomePage() {
             variant="calculators"
             kicker="Hesaplama araçları"
             title="Pratik mali hesaplamalar"
-            lead="Bordro, kıdem, IFRS ve vergi hesaplamalarına hızlı erişim."
             action={
               <a
                 href="https://www.ozcankutlu.com/tr"
