@@ -7,34 +7,19 @@ import { getSiteSettings } from "@/lib/settings";
 
 export const revalidate = 1800;
 
-const homeServices = [
-  {
-    title: "Muhasebe ve defter",
-    text: "Günlük evrak, e-defter ve dönem sonu kapanışları.",
-  },
-  {
-    title: "Vergi danışmanlığı",
-    text: "KDV, stopaj, kurumlar ve gelir vergisi planlaması.",
-  },
-  {
-    title: "Bordro ve SGK",
-    text: "Personel bordrosu ve bildirge süreçlerinin yönetimi.",
-  },
-  {
-    title: "Şirket kuruluşu",
-    text: "Doğru şirket türü, kuruluş evrakları ve ilk dönem kurulum.",
-  },
-];
-
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  const [posts, externalNews] = await Promise.all([
+  const [posts, externalNews, homeServices] = await Promise.all([
     prisma.post.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
     fetchExternalNews(settings.externalNewsUrl, 20),
+    prisma.service.findMany({
+      orderBy: { sortOrder: "asc" },
+      take: 4,
+    }),
   ]);
 
   return (
@@ -150,9 +135,9 @@ export default async function HomePage() {
           </div>
           <div className="service-grid home-services">
             {homeServices.map((service) => (
-              <article key={service.title} className="service-item">
+              <article key={service.id} className="service-item">
                 <h3>{service.title}</h3>
-                <p>{service.text}</p>
+                <p>{service.description}</p>
               </article>
             ))}
           </div>

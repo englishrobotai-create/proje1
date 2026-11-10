@@ -24,6 +24,7 @@ export type SiteSettings = {
   contactPhone: string;
   contactAddress: string;
   contactHours: string;
+  servicesIntro: string;
 };
 
 const defaults = {
@@ -70,6 +71,9 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     contactPhone: setting?.contactPhone || "+90 (212) 000 00 00",
     contactAddress: setting?.contactAddress || "İstanbul, Türkiye",
     contactHours: setting?.contactHours || "Hafta içi 09:00 – 18:00",
+    servicesIntro:
+      setting?.servicesIntro ||
+      "Standart hizmet paketimiz, mali müşavirlik ofisinizin temel ihtiyaçlarını kapsayacak şekilde hazırlanmıştır.",
   };
 }
 

@@ -63,6 +63,50 @@ async function main() {
     },
   });
 
+  const serviceCount = await prisma.service.count();
+  if (serviceCount === 0) {
+    await prisma.service.createMany({
+      data: [
+        {
+          title: "Muhasebe ve defter tutma",
+          description:
+            "Günlük evrak takibi, e-defter/e-fatura süreçleri ve dönem sonu kapanışları.",
+          sortOrder: 0,
+        },
+        {
+          title: "Vergi danışmanlığı",
+          description:
+            "KDV, stopaj, kurumlar ve gelir vergisi planlaması ile beyan yönetimi.",
+          sortOrder: 1,
+        },
+        {
+          title: "Bordro ve SGK",
+          description:
+            "Personel bordrosu, bildirge ve işe giriş-çıkış işlemlerinin düzenli yürütülmesi.",
+          sortOrder: 2,
+        },
+        {
+          title: "Şirket kuruluşu",
+          description:
+            "Doğru şirket türü seçimi, kuruluş evrakları ve ilk dönem muhasebe kurulumu.",
+          sortOrder: 3,
+        },
+        {
+          title: "Mali analiz",
+          description:
+            "Dönemsel özetler, nakit akışı görünümü ve yönetim kararları için sade raporlar.",
+          sortOrder: 4,
+        },
+        {
+          title: "Denetim hazırlığı",
+          description:
+            "Kontroller öncesi belge düzeni, risk taraması ve süreç iyileştirme önerileri.",
+          sortOrder: 5,
+        },
+      ],
+    });
+  }
+
   const existing = await prisma.post.count();
   if (existing === 0) {
     await prisma.post.createMany({

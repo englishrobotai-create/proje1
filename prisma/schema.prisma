@@ -41,8 +41,18 @@ model Setting {
   contactPhone     String @default("+90 (212) 000 00 00")
   contactAddress   String @default("İstanbul, Türkiye")
   contactHours     String @default("Hafta içi 09:00 – 18:00")
+  servicesIntro    String @default("Standart hizmet paketimiz, mali müşavirlik ofisinizin temel ihtiyaçlarını kapsayacak şekilde hazırlanmıştır.")
 
   updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Post {
