@@ -1,10 +1,9 @@
 # Active Context
 
-Görsel iyileştirme, yararlı linkler ve admin sosyal medya yönetimi eklendi.
+Ana sayfa dolduruldu: tüm yararlı linkler + ozcankutlu.com blog haberleri.
 
 ## Son kararlar
 
-- Ayrı kopya satış modeli
-- Admin’de: blog + site başlığı + sosyal medya
-- 38 yararlı link (`/yararli-linkler`)
-- Kurumsal lacivert/altın görünüm güçlendirildi
+- Yararlı linkler ana sayfada kategori/chip olarak gösteriliyor
+- Güncel haberler `externalNewsUrl` ayarından çekiliyor (varsayılan: ozcankutlu.com/tr/blog)
+- Saatlik revalidate

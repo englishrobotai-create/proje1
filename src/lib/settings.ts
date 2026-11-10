@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { DEFAULT_NEWS_URL } from "./external-news";
 
 export type SiteSettings = {
   siteTitle: string;
@@ -8,6 +9,8 @@ export type SiteSettings = {
   twitter: string;
   youtube: string;
   whatsapp: string;
+  externalNewsUrl: string;
+  externalNewsLabel: string;
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
@@ -20,6 +23,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     twitter: setting?.twitter ?? "",
     youtube: setting?.youtube ?? "",
     whatsapp: setting?.whatsapp ?? "",
+    externalNewsUrl: setting?.externalNewsUrl || DEFAULT_NEWS_URL,
+    externalNewsLabel: setting?.externalNewsLabel || "Özcan Kutlu Blog",
   };
 }
 

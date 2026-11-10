@@ -26,6 +26,8 @@ const schema = z.object({
   twitter: optionalUrl,
   youtube: optionalUrl,
   whatsapp: optionalUrl,
+  externalNewsUrl: optionalUrl,
+  externalNewsLabel: z.string().trim().max(80),
 });
 
 export type SettingsState = {
@@ -51,19 +53,29 @@ export async function updateSettingsAction(
     twitter: formData.get("twitter") ?? "",
     youtube: formData.get("youtube") ?? "",
     whatsapp: formData.get("whatsapp") ?? "",
+    externalNewsUrl: formData.get("externalNewsUrl") ?? "",
+    externalNewsLabel: formData.get("externalNewsLabel") ?? "",
   });
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Geçersiz veri" };
   }
 
+  const data = {
+    ...parsed.data,
+    externalNewsUrl:
+      parsed.data.externalNewsUrl || "https://www.ozcankutlu.com/tr/blog",
+    externalNewsLabel: parsed.data.externalNewsLabel || "Özcan Kutlu Blog",
+  };
+
   await prisma.setting.upsert({
     where: { id: "main" },
-    update: parsed.data,
-    create: { id: "main", ...parsed.data },
+    update: data,
+    create: { id: "main", ...data },
   });
 
   revalidatePath("/", "layout");
+  revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/ayarlar");
 

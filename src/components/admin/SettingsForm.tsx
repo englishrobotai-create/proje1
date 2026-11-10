@@ -31,6 +31,32 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         Bu başlık sitenin logosunda, sekme başlığında ve alt bilgide görünür.
       </p>
 
+      <h3 className="admin-subtitle">Güncel haber kaynağı</h3>
+      <p className="form-hint">
+        Ana sayfadaki güncel haberler bu adresten otomatik çekilir. Varsayılan:
+        ozcankutlu.com blog.
+      </p>
+      <div className="form-row">
+        <label>
+          Haber kaynağı URL
+          <input
+            name="externalNewsUrl"
+            type="url"
+            placeholder="https://www.ozcankutlu.com/tr/blog"
+            defaultValue={settings.externalNewsUrl}
+          />
+        </label>
+        <label>
+          Kaynak etiketi
+          <input
+            name="externalNewsLabel"
+            maxLength={80}
+            placeholder="Özcan Kutlu Blog"
+            defaultValue={settings.externalNewsLabel}
+          />
+        </label>
+      </div>
+
       <h3 className="admin-subtitle">Sosyal medya bağlantıları</h3>
       <p className="form-hint">
         Boş bırakılan alanlar sitede gösterilmez. Adresler https:// ile

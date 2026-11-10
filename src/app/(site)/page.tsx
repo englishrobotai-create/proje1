@@ -5,19 +5,40 @@ import {
   usefulLinkGroups,
 } from "@/data/useful-links";
 import { prisma } from "@/lib/db";
+import { fetchExternalNews } from "@/lib/external-news";
 import { getSiteSettings } from "@/lib/settings";
+
+export const revalidate = 3600;
+
+const homeServices = [
+  {
+    title: "Muhasebe ve defter",
+    text: "Günlük evrak, e-defter ve dönem sonu kapanışları.",
+  },
+  {
+    title: "Vergi danışmanlığı",
+    text: "KDV, stopaj, kurumlar ve gelir vergisi planlaması.",
+  },
+  {
+    title: "Bordro ve SGK",
+    text: "Personel bordrosu ve bildirge süreçlerinin yönetimi.",
+  },
+  {
+    title: "Şirket kuruluşu",
+    text: "Doğru şirket türü, kuruluş evrakları ve ilk dönem kurulum.",
+  },
+];
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-    take: 2,
-  });
-
-  const previewLinks = usefulLinkGroups
-    .flatMap((group) => group.links)
-    .slice(0, 6);
+  const [posts, externalNews] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    }),
+    fetchExternalNews(settings.externalNewsUrl, 9),
+  ]);
 
   return (
     <>
@@ -117,30 +138,62 @@ export default async function HomePage() {
       </section>
 
       <section className="section">
-        <div className="container section-split">
-          <div>
-            <p className="section-kicker">Kaynaklar</p>
-            <h2 className="section-title">Yararlı linkler</h2>
-            <p className="section-lead">
-              GİB, SGK, e-Devlet ve meslek odaları dahil {usefulLinkCount}{" "}
-              sık kullanılan kaynağa hızlı erişim.
-            </p>
-            <Link href="/yararli-linkler" className="btn btn-primary">
-              Tüm linkleri gör
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="section-kicker">Hizmetler</p>
+              <h2 className="section-title">Neler yapıyoruz</h2>
+            </div>
+            <Link href="/hizmetler" className="btn btn-secondary">
+              Tüm hizmetler
             </Link>
           </div>
-          <div className="mini-link-grid">
-            {previewLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mini-link"
-              >
-                <strong>{link.title}</strong>
-                <span>{link.description}</span>
-              </a>
+          <div className="service-grid home-services">
+            {homeServices.map((service) => (
+              <article key={service.title} className="service-item">
+                <h3>{service.title}</h3>
+                <p>{service.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section band-section" id="yararli-linkler">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="section-kicker">Kaynaklar</p>
+              <h2 className="section-title">Yararlı linkler</h2>
+              <p className="section-lead">
+                GİB, SGK, e-Devlet ve meslek odaları dahil {usefulLinkCount}{" "}
+                sık kullanılan kaynağa ana sayfadan erişin.
+              </p>
+            </div>
+            <Link href="/yararli-linkler" className="btn btn-primary">
+              Ayrı sayfada aç
+            </Link>
+          </div>
+
+          <div className="home-link-groups">
+            {usefulLinkGroups.map((group) => (
+              <div key={group.category} className="home-link-group">
+                <h3>{group.category}</h3>
+                <div className="home-link-chips">
+                  {group.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link-chip"
+                      title={link.description}
+                    >
+                      {link.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -148,11 +201,69 @@ export default async function HomePage() {
 
       <section className="section">
         <div className="container">
-          <p className="section-kicker">Blog</p>
-          <h2 className="section-title">Güncel yazılar</h2>
-          <p className="section-lead">
-            Vergi ve işletme yönetimi hakkında pratik notlar.
-          </p>
+          <div className="section-head">
+            <div>
+              <p className="section-kicker">Güncel</p>
+              <h2 className="section-title">Güncel haberler</h2>
+              <p className="section-lead">
+                {settings.externalNewsLabel} kaynağından otomatik güncellenen
+                yazılar.
+              </p>
+            </div>
+            <a
+              href={settings.externalNewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+            >
+              Kaynağa git
+            </a>
+          </div>
+
+          {externalNews.length === 0 ? (
+            <div className="admin-panel">
+              <p style={{ margin: 0 }}>
+                Haberler şu an yüklenemedi. Kaynak adresini admin ayarlarından
+                kontrol edin.
+              </p>
+            </div>
+          ) : (
+            <div className="news-grid">
+              {externalNews.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="news-card"
+                >
+                  {item.dateLabel ? (
+                    <span className="post-meta">{item.dateLabel}</span>
+                  ) : null}
+                  <strong>{item.title}</strong>
+                  {item.excerpt ? <span>{item.excerpt}</span> : null}
+                  <em>Devamını oku →</em>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="section band-section">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="section-kicker">Blog</p>
+              <h2 className="section-title">Ofis yazılarımız</h2>
+              <p className="section-lead">
+                Bu sitede yayınlanan yerel blog içerikleri.
+              </p>
+            </div>
+            <Link href="/blog" className="btn btn-secondary">
+              Tüm yazılar
+            </Link>
+          </div>
           <div className="post-grid">
             {posts.length === 0 ? (
               <article className="post-item">

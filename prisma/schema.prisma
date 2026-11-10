@@ -16,15 +16,17 @@ model User {
 }
 
 model Setting {
-  id        String   @id @default("main")
-  siteTitle String
-  facebook  String   @default("")
-  instagram String   @default("")
-  linkedin  String   @default("")
-  twitter   String   @default("")
-  youtube   String   @default("")
-  whatsapp  String   @default("")
-  updatedAt DateTime @updatedAt
+  id               String   @id @default("main")
+  siteTitle        String
+  facebook         String   @default("")
+  instagram        String   @default("")
+  linkedin         String   @default("")
+  twitter          String   @default("")
+  youtube          String   @default("")
+  whatsapp         String   @default("")
+  externalNewsUrl  String   @default("https://www.ozcankutlu.com/tr/blog")
+  externalNewsLabel String  @default("Özcan Kutlu Blog")
+  updatedAt        DateTime @updatedAt
 }
 
 model Post {
