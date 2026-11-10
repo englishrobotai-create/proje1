@@ -619,6 +619,107 @@ img {
   margin-bottom: 1.5rem;
 }
 
+.section-heading {
+  align-items: center;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(210, 222, 231, 0.85);
+}
+
+.section-heading-copy {
+  min-width: 0;
+}
+
+.section-heading-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.section-heading-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #f4e9cf;
+  background: linear-gradient(145deg, #0d3b48, #07262f);
+  box-shadow:
+    0 12px 24px rgba(7, 38, 47, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.section-heading-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.section-heading-kicker {
+  margin: 0;
+  position: relative;
+  padding-left: 0.85rem;
+}
+
+.section-heading-kicker::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 4px rgba(184, 146, 63, 0.18);
+}
+
+.section-heading-title {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(2.15rem, 4.4vw, 3.35rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  background: linear-gradient(120deg, var(--brand-deep) 0%, #1a5563 55%, #8a7040 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section-heading-title::after {
+  content: "";
+  display: block;
+  width: 4.25rem;
+  height: 3px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), rgba(184, 146, 63, 0));
+}
+
+.section-heading .section-lead {
+  margin-top: 0.9rem;
+}
+
+.section-heading-services .section-heading-icon {
+  background: linear-gradient(145deg, #0d3b48, #145868);
+}
+
+.section-heading-blog .section-heading-icon {
+  background: linear-gradient(145deg, #1a3f4d, #0d3b48);
+  color: #f0e4c8;
+}
+
+.section-heading-calculators .section-heading-icon {
+  background: linear-gradient(145deg, #8a7040, #b8923f);
+  color: #fff8e8;
+}
+
+.section-heading-action {
+  flex-shrink: 0;
+  padding-bottom: 0.35rem;
+}
+
 .mg-wrap {
   width: 100%;
   padding: 0.85rem 0 0.7rem;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MaliGelismelerSlider } from "@/components/MaliGelismelerSlider";
+import { SectionHeading } from "@/components/SectionHeading";
 import { calculatorLinks } from "@/data/calculators";
 import { prisma } from "@/lib/db";
 import { fetchExternalNews } from "@/lib/external-news";
@@ -124,15 +125,16 @@ export default async function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Hizmetler</p>
-              <h2 className="section-title">Neler yapıyoruz</h2>
-            </div>
-            <Link href="/hizmetler" className="btn btn-secondary">
-              Tüm hizmetler
-            </Link>
-          </div>
+          <SectionHeading
+            variant="services"
+            kicker="Hizmetler"
+            title="Neler yapıyoruz"
+            action={
+              <Link href="/hizmetler" className="btn btn-secondary">
+                Tüm hizmetler
+              </Link>
+            }
+          />
           <div className="service-grid home-services">
             {homeServices.map((service) => (
               <article key={service.id} className="service-item">
@@ -146,15 +148,16 @@ export default async function HomePage() {
 
       <section className="section band-section">
         <div className="container">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Blog</p>
-              <h2 className="section-title">Blog yazılarımız</h2>
-            </div>
-            <Link href="/blog" className="btn btn-secondary">
-              Tüm yazılar
-            </Link>
-          </div>
+          <SectionHeading
+            variant="blog"
+            kicker="Blog"
+            title="Blog yazılarımız"
+            action={
+              <Link href="/blog" className="btn btn-secondary">
+                Tüm yazılar
+              </Link>
+            }
+          />
           <div className="post-grid">
             {posts.length === 0 ? (
               <article className="post-item">
@@ -180,23 +183,22 @@ export default async function HomePage() {
 
       <section className="section band-section" id="hesaplamalar">
         <div className="container">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Hesaplama araçları</p>
-              <h2 className="section-title">Pratik mali hesaplamalar</h2>
-              <p className="section-lead">
-                Bordro, kıdem, IFRS ve vergi hesaplamalarına hızlı erişim.
-              </p>
-            </div>
-            <a
-              href="https://www.ozcankutlu.com/tr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
-            >
-              Tüm araçlar
-            </a>
-          </div>
+          <SectionHeading
+            variant="calculators"
+            kicker="Hesaplama araçları"
+            title="Pratik mali hesaplamalar"
+            lead="Bordro, kıdem, IFRS ve vergi hesaplamalarına hızlı erişim."
+            action={
+              <a
+                href="https://www.ozcankutlu.com/tr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Tüm araçlar
+              </a>
+            }
+          />
 
           <div className="calculator-grid">
             {calculatorLinks.map((tool) => (
