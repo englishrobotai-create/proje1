@@ -53,6 +53,12 @@ function themeClass(theme: string) {
   return "theme-crimson";
 }
 
+function shorten(text: string, max = 140) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, max - 1).trimEnd()}…`;
+}
+
 export function MaliGelismelerSlider({ items }: { items: ExternalNewsItem[] }) {
   const [index, setIndex] = useState(0);
 
@@ -85,8 +91,10 @@ export function MaliGelismelerSlider({ items }: { items: ExternalNewsItem[] }) {
           <CalendarIcon className="mg-badge-icon" />
           {item.badge}
         </span>
-        <h3>{item.title}</h3>
-        {item.summary ? <p>{item.summary}</p> : null}
+        <h3 title={item.title}>{shorten(item.title, 90)}</h3>
+        {item.summary ? (
+          <p title={item.summary}>{shorten(item.summary, 150)}</p>
+        ) : null}
         <div className="mg-meta">
           <CalendarIcon className="mg-meta-icon" />
           <span>

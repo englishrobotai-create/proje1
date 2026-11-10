@@ -44,9 +44,7 @@ export default async function HomePage() {
   return (
     <>
       <section className="mg-wrap">
-        <div className="container">
-          <MaliGelismelerSlider items={externalNews} />
-        </div>
+        <MaliGelismelerSlider items={externalNews} />
       </section>
 
       <section className="hero">
