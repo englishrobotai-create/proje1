@@ -1807,7 +1807,15 @@ textarea:focus {
   }
 
   .hero-panel {
-    min-height: 280px;
+    min-height: 220px;
+  }
+
+  .hero {
+    padding: 1.5rem 0 1.75rem;
+  }
+
+  .section {
+    padding: 2.1rem 0;
   }
 
   .admin-sidebar {
