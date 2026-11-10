@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { MaliGelismelerSlider } from "@/components/MaliGelismelerSlider";
-import { SocialLinks } from "@/components/SocialLinks";
 import {
   usefulLinkCount,
   usefulLinkGroups,
@@ -68,7 +67,6 @@ export default async function HomePage() {
                 Hizmetleri İncele
               </Link>
             </div>
-            <SocialLinks settings={settings} variant="hero" />
           </div>
           <div className="hero-panel" aria-hidden="true">
             <div className="hero-panel-glow" />

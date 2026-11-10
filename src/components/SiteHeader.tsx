@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { SiteSettings } from "@/lib/settings";
-import { SocialLinks } from "./SocialLinks";
 
 const links = [
   { href: "/", label: "Ana Sayfa" },
@@ -30,7 +29,6 @@ export function SiteHeader({ settings }: { settings: SiteSettings }) {
           ))}
         </nav>
         <div className="header-right">
-          <SocialLinks settings={settings} />
           <Link href="/iletisim" className="btn btn-primary header-cta">
             Randevu Alın
           </Link>
@@ -59,7 +57,6 @@ export function SiteHeader({ settings }: { settings: SiteSettings }) {
               {link.label}
             </Link>
           ))}
-          <SocialLinks settings={settings} />
         </div>
       ) : null}
     </header>
