@@ -190,7 +190,6 @@ export default async function HomePage() {
               >
                 <strong>{tool.title}</strong>
                 <span>{tool.description}</span>
-                <em>Aç →</em>
               </a>
             ))}
           </div>
