@@ -51,7 +51,7 @@ export function ServiceForm({ mode, serviceId, defaults }: ServiceFormProps) {
         />
       </label>
       <label>
-        Sıra
+        Sıra (küçük sayı önce görünür)
         <input
           name="sortOrder"
           type="number"

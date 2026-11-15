@@ -33,11 +33,11 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
 
       <h3 className="admin-subtitle">Güncel mali gelişmeler</h3>
       <p className="form-hint">
-        Ana sayfadaki CANLI kaydırıcı bu JSON API’den beslenir.
+        Ana sayfadaki “CANLI” haber şeridi bu adresten beslenir. Ne yazacağınızı bilmiyorsanız olduğu gibi bırakın.
       </p>
       <div className="form-row">
         <label>
-          API URL
+          Haber kaynağı adresi
           <input
             name="externalNewsUrl"
             type="url"

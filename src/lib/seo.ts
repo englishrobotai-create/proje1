@@ -103,19 +103,6 @@ export function pageMetadata(
 
 type JsonObject = Record<string, unknown>;
 
-/** Profil sayfası olan bir adres mi? ("https://facebook.com/" gibi kök adresler yer tutucudur.) */
-function isProfileUrl(href: string): boolean {
-  try {
-    const url = new URL(href);
-    return (
-      (url.protocol === "https:" || url.protocol === "http:") &&
-      url.pathname.replace(/\/+$/, "").length > 0
-    );
-  } catch {
-    return false;
-  }
-}
-
 /** Ofisin kimlik düğümüne referans (@id varsa onu, yoksa adı kullanır). */
 export function organizationRef(settings: SiteSettings): JsonObject {
   const base = getSiteUrl();
@@ -138,8 +125,7 @@ export function buildSiteGraph(settings: SiteSettings): JsonObject {
   // WhatsApp bir profil sayfası olmadığı için sameAs'a girmez.
   const sameAs = getActiveSocialLinks(settings)
     .filter((item) => item.key !== "whatsapp")
-    .map((item) => item.href.trim())
-    .filter(isProfileUrl);
+    .map((item) => item.href.trim());
 
   const organization: JsonObject = {
     "@type": "AccountingService",

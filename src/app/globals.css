@@ -1298,42 +1298,6 @@ textarea:focus {
   background: #edf2f5;
 }
 
-.admin-sidebar {
-  background: linear-gradient(180deg, #16294a, #0e1b30);
-  color: white;
-  padding: 1.5rem 1rem;
-}
-
-.admin-sidebar h1 {
-  font-family: var(--font-display), serif;
-  font-size: 1.25rem;
-  margin: 0 0 1.5rem;
-}
-
-.admin-nav {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.admin-nav a,
-.admin-nav button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.86);
-  padding: 0.75rem 0.85rem;
-  border-radius: 10px;
-  font: inherit;
-  cursor: pointer;
-}
-
-.admin-nav a:hover,
-.admin-nav button:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
 .admin-main {
   padding: 1.5rem;
 }
@@ -1522,13 +1486,6 @@ textarea:focus {
     padding: 2.1rem 0;
   }
 
-  .admin-sidebar {
-    padding-bottom: 0.5rem;
-  }
-
-  .admin-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 420px) {

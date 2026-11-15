@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+} from "../src/lib/default-admin";
 
 const prisma = new PrismaClient();
 
@@ -10,9 +14,9 @@ async function main() {
   if ((await prisma.user.count()) === 0) {
     await prisma.user.create({
       data: {
-        email: "admin@ornek.com",
+        email: DEFAULT_ADMIN_EMAIL,
         name: "Site Yöneticisi",
-        passwordHash: await bcrypt.hash("Admin123!", 10),
+        passwordHash: await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10),
       },
     });
   }
@@ -44,10 +48,6 @@ async function main() {
     where: { id: "main" },
     update: {
       siteTitle,
-      facebook: "https://facebook.com/",
-      instagram: "https://instagram.com/",
-      linkedin: "https://linkedin.com/",
-      whatsapp: "https://wa.me/905550000000",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
       externalNewsLabel: "Güncel Mali Gelişmeler",
       ...aboutDefaults,
@@ -55,12 +55,13 @@ async function main() {
     create: {
       id: "main",
       siteTitle,
-      facebook: "https://facebook.com/",
-      instagram: "https://instagram.com/",
-      linkedin: "https://linkedin.com/",
+      // Sosyal medya varsayılan olarak boş: gerçek adresler Admin > Sosyal Medya'dan girilir.
+      facebook: "",
+      instagram: "",
+      linkedin: "",
       twitter: "",
       youtube: "",
-      whatsapp: "https://wa.me/905550000000",
+      whatsapp: "",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
       externalNewsLabel: "Güncel Mali Gelişmeler",
       ...aboutDefaults,

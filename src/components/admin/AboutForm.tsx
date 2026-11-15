@@ -21,7 +21,12 @@ export function AboutForm({ settings }: { settings: SiteSettings }) {
         />
       </label>
 
-      <h3 className="admin-subtitle">1. Panel</h3>
+      <p className="form-hint">
+        Hakkımda sayfasında üç kutu görünür. Her kutunun başlığını ve metnini
+        aşağıdan düzenleyin.
+      </p>
+
+      <h3 className="admin-subtitle">1. Kutu</h3>
       <label>
         Başlık
         <input
@@ -40,7 +45,7 @@ export function AboutForm({ settings }: { settings: SiteSettings }) {
         />
       </label>
 
-      <h3 className="admin-subtitle">2. Panel</h3>
+      <h3 className="admin-subtitle">2. Kutu</h3>
       <label>
         Başlık
         <input
@@ -59,7 +64,7 @@ export function AboutForm({ settings }: { settings: SiteSettings }) {
         />
       </label>
 
-      <h3 className="admin-subtitle">3. Panel</h3>
+      <h3 className="admin-subtitle">3. Kutu</h3>
       <label>
         Başlık
         <input

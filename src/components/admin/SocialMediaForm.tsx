@@ -5,6 +5,7 @@ import {
   updateSettingsAction,
   type SettingsState,
 } from "@/app/actions/settings";
+import { isRealSocialUrl } from "@/lib/social-links";
 import type { SiteSettings } from "@/lib/settings";
 
 const initial: SettingsState = {};
@@ -68,7 +69,9 @@ export function SocialMediaForm({ settings }: { settings: SiteSettings }) {
     whatsapp: settings.whatsapp,
   });
 
-  const visibleCount = platforms.filter((p) => enabled[p.key] && urls[p.key].trim()).length;
+  const visibleCount = platforms.filter(
+    (p) => enabled[p.key] && isRealSocialUrl(urls[p.key]),
+  ).length;
 
   return (
     <form action={action} className="admin-form">
@@ -78,8 +81,10 @@ export function SocialMediaForm({ settings }: { settings: SiteSettings }) {
       <input type="hidden" name="externalNewsLabel" value={settings.externalNewsLabel} />
 
       <p className="form-hint" style={{ marginTop: 0 }}>
-        Açık olan platformlar footer’da ikon olarak görünür. Kapalı olanlar
-        gizlenir. Şu an görünen: <strong>{visibleCount}</strong>
+        Açık olan platformlar sitenin alt bilgisinde ikon olarak görünür.
+        Kapalı olanlar ve adresi boş ya da yalnızca alan adından oluşan
+        (örn. https://facebook.com/) platformlar gösterilmez. Şu an
+        görünen: <strong>{visibleCount}</strong>
       </p>
 
       <div className="social-admin-list">
@@ -98,7 +103,13 @@ export function SocialMediaForm({ settings }: { settings: SiteSettings }) {
                 }}
               />
               <span>{platform.label}</span>
-              <em>{enabled[platform.key] ? "Görünür" : "Gizli"}</em>
+              <em>
+                {!enabled[platform.key]
+                  ? "Gizli"
+                  : isRealSocialUrl(urls[platform.key])
+                    ? "Görünür"
+                    : "Adres bekleniyor"}
+              </em>
             </label>
 
             <input
@@ -114,6 +125,14 @@ export function SocialMediaForm({ settings }: { settings: SiteSettings }) {
                 }))
               }
             />
+            {enabled[platform.key] &&
+            urls[platform.key].trim() &&
+            !isRealSocialUrl(urls[platform.key]) ? (
+              <p className="form-hint" style={{ margin: "0.4rem 0 0" }}>
+                Bu adres yer tutucu görünüyor, sitede gösterilmez. Hesabınızın
+                tam adresini yazın.
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

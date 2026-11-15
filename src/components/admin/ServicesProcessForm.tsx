@@ -28,7 +28,9 @@ export function ServicesProcessForm({ process }: { process: string }) {
         />
       </label>
       <p className="form-hint">
-        Her satıra bir adım yazın: <strong>Başlık | Açıklama</strong>. En fazla 8
+        Her satıra bir adım yazın; başlığı ve açıklamayı dikey çizgiyle (
+        <strong>|</strong>) ayırın. Örnek:{" "}
+        <em>Tanışma | İhtiyaçlarınızı birlikte netleştiririz.</em> En fazla 8
         adım gösterilir. Bu metni kendi çalışma düzeninize göre düzenleyin.
       </p>
       {state.error ? <p className="form-error">{state.error}</p> : null}

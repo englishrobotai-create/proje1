@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import "./admin.css";
 import { logoutAction } from "@/app/actions/auth";
+import { AdminNav } from "@/components/admin/AdminNav";
 import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -21,30 +22,7 @@ export default async function AdminLayout({
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <h1>Yönetim Paneli</h1>
-        <nav className="admin-nav">
-          <Link href="/admin">Özet</Link>
-          <Link href="/admin/blog">Blog Yazıları</Link>
-          <Link href="/admin/blog/yeni">Yeni Blog Yazısı</Link>
-          <Link href="/admin/hizmetler">Hizmetler</Link>
-          <Link href="/admin/hakkimizda">Hakkımda</Link>
-          <Link href="/admin/iletisim">İletişim</Link>
-          <Link href="/admin/kvkk">KVKK Metni</Link>
-          <Link href="/admin/sosyal-medya">Sosyal Medya</Link>
-          <Link href="/admin/mesajlar">Mesajlar</Link>
-          <Link href="/admin/mukellefler">Mükellefler</Link>
-          <Link href="/admin/ayarlar">Ayarlar</Link>
-          <Link href="/admin/hesap">Hesabım</Link>
-          <Link href="/" target="_blank">
-            Siteyi Gör
-          </Link>
-          <form action={logoutAction}>
-            <button type="submit">Çıkış Yap</button>
-          </form>
-        </nav>
-        <p style={{ marginTop: "1.5rem", opacity: 0.7, fontSize: "0.85rem" }}>
-          {session.name}
-        </p>
+        <AdminNav userName={session.name} logoutAction={logoutAction} />
       </aside>
       <div className="admin-main">{children}</div>
     </div>

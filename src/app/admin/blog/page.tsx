@@ -57,6 +57,16 @@ export default async function AdminBlogPage() {
                       >
                         Düzenle
                       </Link>
+                      {post.published ? (
+                        <Link
+                          href={`/blog/${post.slug}`}
+                          target="_blank"
+                          className="btn btn-secondary"
+                          style={{ padding: "0.45rem 0.8rem" }}
+                        >
+                          Görüntüle
+                        </Link>
+                      ) : null}
                       <form action={togglePostPublishedAction.bind(null, post.id)}>
                         <button
                           type="submit"

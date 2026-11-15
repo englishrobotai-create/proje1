@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { DEFAULT_NEWS_URL } from "./external-news";
+import { isRealSocialUrl } from "./social-links";
 
 export type SiteSettings = {
   siteTitle: string;
@@ -26,6 +27,13 @@ export type SiteSettings = {
   contactHours: string;
   servicesIntro: string;
 };
+
+/** Ayar girilmemişse sitede görünen yer tutucu iletişim bilgileri (gerçek bilgi değildir). */
+export const CONTACT_PLACEHOLDERS = {
+  email: "info@ornek-mm.com",
+  phone: "+90 (212) 000 00 00",
+  address: "İstanbul, Türkiye",
+} as const;
 
 const defaults = {
   aboutIntro:
@@ -67,9 +75,9 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     contactHeroText:
       setting?.contactHeroText ||
       `${siteTitle} ${defaults.contactHeroText}`,
-    contactEmail: setting?.contactEmail || "info@ornek-mm.com",
-    contactPhone: setting?.contactPhone || "+90 (212) 000 00 00",
-    contactAddress: setting?.contactAddress || "İstanbul, Türkiye",
+    contactEmail: setting?.contactEmail || CONTACT_PLACEHOLDERS.email,
+    contactPhone: setting?.contactPhone || CONTACT_PLACEHOLDERS.phone,
+    contactAddress: setting?.contactAddress || CONTACT_PLACEHOLDERS.address,
     contactHours: setting?.contactHours || "Hafta içi 09:00 – 18:00",
     servicesIntro:
       setting?.servicesIntro ||
@@ -77,6 +85,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   };
 }
 
+/** Sitede gösterilecek sosyal medya bağlantıları (yer tutucu adresler hariç). */
 export function getActiveSocialLinks(settings: SiteSettings) {
   return [
     { key: "facebook", label: "Facebook", href: settings.facebook },
@@ -85,7 +94,7 @@ export function getActiveSocialLinks(settings: SiteSettings) {
     { key: "twitter", label: "X", href: settings.twitter },
     { key: "youtube", label: "YouTube", href: settings.youtube },
     { key: "whatsapp", label: "WhatsApp", href: settings.whatsapp },
-  ].filter((item) => item.href.trim().length > 0);
+  ].filter((item) => isRealSocialUrl(item.href));
 }
 
 export function slugify(text: string) {

@@ -9,6 +9,7 @@ Ayrı kopya modeliyle satılmak üzere hazırlanmış Next.js mali müşavir sit
 - Blog yazısı ekleme / düzenleme / silme; yazı içinde başlık (`##`, `###`), liste, **kalın** ve bağlantı yazılabilir
 - Blog için SEO: sabit yazı adresi (başlık değişince değişmez; elle değiştirilirse eski adres yönlenir), yazıya özel SEO başlığı/açıklaması, yazar, ilk yayın tarihi, otomatik paylaşım görseli (WhatsApp/LinkedIn/X), `BlogPosting` şeması, ilgili yazılar, `/blog/feed.xml` RSS beslemesi
 - Site başlığını değiştirme
+- Admin > Özet'te “Canlıya hazırlık” kutusu: varsayılan şifre, yer tutucu başlık/iletişim bilgisi, örnek blog yazıları, örnek fotoğraf ve eksik ayarları listeler
 - Görüşme talebi formu (konu, ulaşma şekli ve zaman seçimi) ve gelen mesajları panelde görme
 - Yeni mesaj gelince ofisin e-postasına bildirim (SMTP; isteğe bağlı, aşağıya bakın)
 - KVKK aydınlatma metni sayfası (`/kvkk`); form altından bağlanır, müşteriye özel alanlar Admin > KVKK Metni'nden düzenlenir
@@ -43,7 +44,7 @@ Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 3. `npm install` ve `npm run db:setup` çalıştırın
 4. Hostinge alın (`npm run build` + `npm run start`)
 5. Admin şifresini (Admin > Hesabım) ve site başlığını (Admin > Ayarlar) müşteriyle güncelleyin. Varsayılan başlık "SMMM Ad Soyad" yer tutucudur; müşterinin gerçek adı yazılmadan yayına almayın. Dikkat: `npm run db:seed` Hakkımda/İletişim metinlerini ve başlığı varsayılana geri yazar; müşterinin sitesi özelleştirildikten sonra seed'i yeniden çalıştırmayın
-6. Yer tutucu iletişim bilgilerini (e-posta, telefon, adres) ve hizmet/hakkında metinlerini müşteriye özel yazın; yer tutucular arama motorlarına verilmez ama sitede görünür
+6. Yer tutucu iletişim bilgilerini (e-posta, telefon, adres) ve hizmet/hakkında metinlerini müşteriye özel yazın; yer tutucular arama motorlarına verilmez ama sitede görünür; Admin > Özet'teki “Canlıya hazırlık” kutusu bunlardan hangilerinin kaldığını gösterir. Sosyal medya simgeleri gerçek bir adres girilene kadar sitede gösterilmez (Admin > Sosyal Medya)
 7. Admin > Hizmetler'den "Nasıl çalışıyoruz" adımlarını müşterinin kendi çalışma düzenine göre yazın
 8. Admin > İletişim > Mesleki Bilgiler'i müşterinin bilgileriyle doldurun. SMMM/YMM Haksız Rekabet ve Reklam Yasağı Yönetmeliği'nin 22. maddesi sitede bu bilgilerin bulunmasını, sitenin odaya bildirilmesini ve meslek unvanı uzantılı bir `.tr` alan adı kullanılmasını ister. Kuralın müşteriye nasıl uygulandığını müşterinin bağlı olduğu oda doğrulamalıdır; bu proje bir uygunluk garantisi vermez.
 9. E-posta bildirimi için `.env` içine `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (ve gerekirse `MAIL_FROM`, `NOTIFY_EMAIL`) yazın; ayrıntılar `.env.example` içinde. Ardından Admin > Mesajlar'daki "Test e-postası gönder" düğmesiyle deneyin. SMTP tanımlı değilse bildirim kapalıdır, mesajlar yine panelde görünür. İletişim sayfasındaki e-posta yer tutucu (`ornek-mm.com`) kalırsa bildirim gönderilmez.
