@@ -1,4 +1,4 @@
-import { ensureColumns, prisma } from "./db";
+import { prisma } from "./db";
 import {
   parseProfessionalInfo,
   serializeProfessionalInfo,
@@ -7,12 +7,10 @@ import {
 
 /**
  * Mesleki bilgiler Setting tablosundaki `professionalInfo` sütununda JSON olarak tutulur.
- * Sütun ham SQL ile okunur/yazılır: Prisma istemcisi yeniden üretilmemiş ve
- * `prisma db push` yapılmamış olsa da çalışır (sütun ilk kullanımda kendiliğinden eklenir).
+ * Sütun ham SQL ile okunur/yazılır.
  */
 export async function getProfessionalInfo(): Promise<ProfessionalInfo> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<{ professionalInfo: string | null }[]>`
       SELECT "professionalInfo" FROM "Setting" WHERE "id" = 'main' LIMIT 1
     `;
@@ -25,7 +23,6 @@ export async function getProfessionalInfo(): Promise<ProfessionalInfo> {
 export async function saveProfessionalInfo(
   info: ProfessionalInfo,
 ): Promise<void> {
-  await ensureColumns();
   await prisma.setting.upsert({
     where: { id: "main" },
     update: {},

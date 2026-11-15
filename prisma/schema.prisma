@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -70,7 +70,7 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Sonradan eklenen alanlar (kendiliğinden eklenir; ham SQL ile okunup yazılır).
+  // Sonradan eklenen alanlar (ham SQL ile okunup yazılır).
   seoTitle       String @default("") // boşsa başlık kullanılır
   seoDescription String @default("") // boşsa özet kullanılır
   slugHistory    String @default("") // eski adresler (JSON dizi); eski adres yeniye yönlenir
@@ -90,9 +90,8 @@ model Message {
 }
 
 // ---- Mükellef Köşesi ----------------------------------------------------------------
-// Bu tablolar ilk kullanımda kendiliğinden oluşturulur (src/lib/portal-db.ts) ve ham SQL ile
-// okunur/yazılır; burada tanımlı olmaları `prisma db push` yapıldığında şemayla çakışmamaları
-// içindir. Tarihler ISO metin, tutarlar tam sayı kuruştur. İlişkiler bilinçli olarak
+// Bu tablolar `prisma db push` ile oluşturulur; src/lib/portal-db.ts bunları ham SQL ile
+// okur/yazar. Tarihler ISO metin, tutarlar tam sayı kuruştur. İlişkiler bilinçli olarak
 // tanımlanmamıştır (silme işlemleri uygulama kodunda yapılır).
 
 model Mukellef {

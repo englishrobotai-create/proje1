@@ -11,12 +11,21 @@ async function main() {
   // Yönetici e-postası Admin > Hesabım'dan değiştirilebildiği için varsayılan yönetici yalnızca
   // hiç kullanıcı yoksa oluşturulur; aksi halde seed yeniden çalışınca varsayılan şifreli
   // ikinci bir yönetici doğardı.
+  // Canlı veritabanında herkesçe bilinen varsayılan şifreyi hiç kullanmamak için yönetici
+  // bilgileri ortam değişkenleriyle verilebilir:
+  //   ADMIN_EMAIL="siz@ofis.com" ADMIN_PASSWORD="uzun-bir-sifre" npm run db:seed
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || DEFAULT_ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+  if (process.env.ADMIN_PASSWORD && adminPassword.length < 10) {
+    throw new Error("ADMIN_PASSWORD en az 10 karakter olmalı.");
+  }
+
   if ((await prisma.user.count()) === 0) {
     await prisma.user.create({
       data: {
-        email: DEFAULT_ADMIN_EMAIL,
+        email: adminEmail,
         name: "Site Yöneticisi",
-        passwordHash: await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10),
+        passwordHash: await bcrypt.hash(adminPassword, 10),
       },
     });
   }

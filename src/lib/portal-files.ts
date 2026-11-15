@@ -11,12 +11,23 @@ import {
   sanitizeFileName,
 } from "./portal-shared";
 import { isId, storedBytes, type PortalFileRow } from "./portal-db";
+import {
+  assertStorageReady,
+  blobEnabled,
+  blobRead,
+  blobRemove,
+  blobRemovePrefix,
+  blobWrite,
+} from "./blob-storage";
 
 /**
  * Yüklenen belgeler `public/` dışında, web'den doğrudan erişilemeyen bir klasörde tutulur:
  *   <PORTAL_STORAGE_DIR | ./storage/portal>/<mukellefId>/<rastgele-ad>
  * Diskteki ad rastgeledir (özgün ad yalnızca veritabanında, gösterim için). Dosyalar yalnızca
  * yetki denetimi yapan indirme rotaları üzerinden sunulur.
+ *
+ * Vercel'de (BLOB_READ_WRITE_TOKEN tanımlıyken) aynı yapı özel Blob mağazasında tutulur:
+ *   portal/<mukellefId>/<rastgele-ad>   (bkz. blob-storage.ts)
  */
 
 const MB = 1024 * 1024;
@@ -27,8 +38,14 @@ function envMb(name: string, fallback: number, min: number, max: number): number
   return Math.min(Math.max(value, min), max);
 }
 
-/** Tek dosya sınırı (varsayılan ve üst sınır 25 MB). Sunucu işlemi gövde sınırı (next.config.ts: 27 MB) bunun üstündedir. */
-export const maxUploadBytes = () => Math.floor(envMb("PORTAL_MAX_UPLOAD_MB", 25, 1, 25) * MB);
+/**
+ * Tek dosya sınırı (varsayılan ve üst sınır 25 MB). Sunucu işlemi gövde sınırı (next.config.ts:
+ * 27 MB) bunun üstündedir. Vercel işlevlerinin istek gövdesi sınırı 4,5 MB olduğu için orada tek
+ * dosya en çok 4 MB olabilir.
+ */
+const platformMaxMb = () => (process.env.VERCEL ? 4 : 25);
+export const maxUploadBytes = () =>
+  Math.floor(envMb("PORTAL_MAX_UPLOAD_MB", platformMaxMb(), 1, platformMaxMb()) * MB);
 export const quotaBytes = () => Math.floor(envMb("PORTAL_QUOTA_MB", 500, 10, 100_000) * MB);
 
 function rootDir(): string {
@@ -45,6 +62,14 @@ function mukellefDir(mukellefId: string): string {
 function storedPath(mukellefId: string, storedName: string): string {
   if (!isId(storedName)) throw new Error("Geçersiz dosya adı");
   return path.join(mukellefDir(mukellefId), storedName);
+}
+
+/** Blob yolu; kimlik biçimleri doğrulanır (yol dışına çıkış mümkün olmaz). */
+function blobKey(mukellefId: string, storedName?: string): string {
+  if (!isId(mukellefId)) throw new Error("Geçersiz mükellef kimliği");
+  if (storedName === undefined) return `portal/${mukellefId}/`;
+  if (!isId(storedName)) throw new Error("Geçersiz dosya adı");
+  return `portal/${mukellefId}/${storedName}`;
 }
 
 export type UploadCheck =
@@ -109,7 +134,12 @@ export async function checkUpload(
 
 /** Rastgele adla diske yazar; yazılan adı döndürür. */
 export async function storeFile(mukellefId: string, bytes: Buffer): Promise<string> {
+  assertStorageReady();
   const storedName = randomUUID();
+  if (blobEnabled()) {
+    await blobWrite(blobKey(mukellefId, storedName), bytes);
+    return storedName;
+  }
   const dir = mukellefDir(mukellefId);
   await mkdir(dir, { recursive: true });
   await writeFile(storedPath(mukellefId, storedName), bytes, { flag: "wx", mode: 0o600 });
@@ -118,6 +148,10 @@ export async function storeFile(mukellefId: string, bytes: Buffer): Promise<stri
 
 export async function readStored(file: PortalFileRow): Promise<Buffer | null> {
   if (!file.storedName) return null; // yalnızca metin içeren mesaj
+  if (blobEnabled()) {
+    if (!isId(file.mukellefId) || !isId(file.storedName)) return null;
+    return blobRead(blobKey(file.mukellefId, file.storedName));
+  }
   try {
     return await readFile(storedPath(file.mukellefId, file.storedName));
   } catch {
@@ -127,6 +161,15 @@ export async function readStored(file: PortalFileRow): Promise<Buffer | null> {
 
 export async function removeStored(mukellefId: string, storedName: string) {
   if (!storedName) return;
+  if (blobEnabled()) {
+    try {
+      await blobRemove(blobKey(mukellefId, storedName));
+    } catch (error) {
+      // Silme hatası işlemi durdurmaz, ama gizli bir belgenin depoda kalmış olabileceği görülsün.
+      console.error("Blob dosyası silinemedi:", error);
+    }
+    return;
+  }
   try {
     await rm(storedPath(mukellefId, storedName), { force: true });
   } catch {
@@ -135,6 +178,14 @@ export async function removeStored(mukellefId: string, storedName: string) {
 }
 
 export async function removeAllStored(mukellefId: string) {
+  if (blobEnabled()) {
+    try {
+      await blobRemovePrefix(blobKey(mukellefId));
+    } catch (error) {
+      console.error("Blob klasörü silinemedi:", error);
+    }
+    return;
+  }
   try {
     await rm(mukellefDir(mukellefId), { recursive: true, force: true });
   } catch {

@@ -1,5 +1,5 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { ensureColumns, prisma } from "./db";
+import { prisma } from "./db";
 import { getSiteSettings } from "./settings";
 import {
   normalizeEmail,
@@ -8,112 +8,9 @@ import {
 } from "./portal-shared";
 
 /**
- * Mükellef Köşesi veri katmanı. Tablolar ilk kullanımda kendiliğinden oluşturulur (kullanıcı
- * `prisma db push` yapmak zorunda kalmasın) ve ham SQL ile okunup yazılır: Prisma istemcisi bu
- * modelleri bilmeyebilir. Şemadaki (schema.prisma) tanımlarla birebir aynıdır.
- * Tarihler ISO metin, tutarlar tam sayı kuruştur.
+ * Mükellef Köşesi veri katmanı. Tablolar şemada (schema.prisma) tanımlıdır ve `prisma db push`
+ * ile oluşturulur; okuma/yazma ham SQL iledir. Tarihler ISO metin, tutarlar tam sayı kuruştur.
  */
-
-const DDL = [
-  `CREATE TABLE IF NOT EXISTS "Mukellef" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "passwordHash" TEXT NOT NULL DEFAULT '',
-    "active" INTEGER NOT NULL DEFAULT 1,
-    "note" TEXT NOT NULL DEFAULT '',
-    "createdAt" TEXT NOT NULL,
-    "lastLoginAt" TEXT NOT NULL DEFAULT ''
-  )`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS "Mukellef_email_key" ON "Mukellef"("email")`,
-  `CREATE TABLE IF NOT EXISTS "PortalToken" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "mukellefId" TEXT NOT NULL,
-    "tokenHash" TEXT NOT NULL,
-    "purpose" TEXT NOT NULL,
-    "expiresAt" TEXT NOT NULL,
-    "usedAt" TEXT NOT NULL DEFAULT '',
-    "createdAt" TEXT NOT NULL
-  )`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS "PortalToken_tokenHash_key" ON "PortalToken"("tokenHash")`,
-  `CREATE INDEX IF NOT EXISTS "PortalToken_mukellefId_idx" ON "PortalToken"("mukellefId")`,
-  `CREATE TABLE IF NOT EXISTS "PortalFile" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "mukellefId" TEXT NOT NULL,
-    "direction" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "period" TEXT NOT NULL DEFAULT '',
-    "originalName" TEXT NOT NULL,
-    "storedName" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
-    "requestId" TEXT NOT NULL DEFAULT '',
-    "createdAt" TEXT NOT NULL,
-    "readAt" TEXT NOT NULL DEFAULT '',
-    "body" TEXT NOT NULL DEFAULT '',
-    "hiddenByClientAt" TEXT NOT NULL DEFAULT ''
-  )`,
-  `CREATE INDEX IF NOT EXISTS "PortalFile_mukellefId_idx" ON "PortalFile"("mukellefId")`,
-  `CREATE TABLE IF NOT EXISTS "DocRequest" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "mukellefId" TEXT NOT NULL,
-    "period" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "note" TEXT NOT NULL DEFAULT '',
-    "status" TEXT NOT NULL DEFAULT 'open',
-    "createdAt" TEXT NOT NULL,
-    "fulfilledAt" TEXT NOT NULL DEFAULT ''
-  )`,
-  `CREATE INDEX IF NOT EXISTS "DocRequest_mukellefId_idx" ON "DocRequest"("mukellefId")`,
-  `CREATE TABLE IF NOT EXISTS "LedgerEntry" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "mukellefId" TEXT NOT NULL,
-    "entryDate" TEXT NOT NULL,
-    "kind" TEXT NOT NULL,
-    "amountKurus" INTEGER NOT NULL,
-    "description" TEXT NOT NULL,
-    "createdAt" TEXT NOT NULL
-  )`,
-  `CREATE INDEX IF NOT EXISTS "LedgerEntry_mukellefId_idx" ON "LedgerEntry"("mukellefId")`,
-];
-
-const PORTAL_FILE_EXTRA_COLUMNS = [
-  { name: "body", definition: `TEXT NOT NULL DEFAULT ''` },
-  { name: "hiddenByClientAt", definition: `TEXT NOT NULL DEFAULT ''` },
-] as const;
-
-let ready: Promise<void> | undefined;
-
-export function ensurePortalTables(): Promise<void> {
-  ready ??= (async () => {
-    await ensureColumns();
-    for (const statement of DDL) {
-      await prisma.$executeRawUnsafe(statement);
-    }
-    // Önceki sürümlerde oluşturulmuş PortalFile tablosuna sonradan eklenen sütunları ekler.
-    const existing = await prisma.$queryRawUnsafe<{ name: string }[]>(
-      `PRAGMA table_info("PortalFile")`,
-    );
-    for (const column of PORTAL_FILE_EXTRA_COLUMNS) {
-      if (existing.some((item) => item.name === column.name)) continue;
-      try {
-        await prisma.$executeRawUnsafe(
-          `ALTER TABLE "PortalFile" ADD COLUMN "${column.name}" ${column.definition}`,
-        );
-      } catch (error) {
-        // Başka bir istek aynı anda eklemiş olabilir; sütun artık varsa sorun yok.
-        const again = await prisma.$queryRawUnsafe<{ name: string }[]>(
-          `PRAGMA table_info("PortalFile")`,
-        );
-        if (!again.some((item) => item.name === column.name)) throw error;
-      }
-    }
-  })().catch((error) => {
-    ready = undefined;
-    throw error;
-  });
-  return ready;
-}
 
 const num = (value: unknown): number => Number(value ?? 0);
 const nowIso = () => new Date().toISOString();
@@ -131,7 +28,6 @@ function isUniqueError(error: unknown): boolean {
 
 export async function isPortalEnabled(): Promise<boolean> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<{ portalEnabled: number | bigint }[]>`
       SELECT "portalEnabled" FROM "Setting" WHERE "id" = 'main'
     `;
@@ -142,7 +38,6 @@ export async function isPortalEnabled(): Promise<boolean> {
 }
 
 export async function setPortalEnabled(on: boolean): Promise<void> {
-  await ensurePortalTables();
   const settings = await getSiteSettings();
   await prisma.setting.upsert({
     where: { id: "main" },
@@ -201,7 +96,6 @@ const toPublic = (row: MukellefRow): Mukellef => {
 
 export async function getMukellefAuth(id: string): Promise<MukellefAuth | null> {
   if (!isId(id)) return null;
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<MukellefRow[]>`
     SELECT * FROM "Mukellef" WHERE "id" = ${id}
   `;
@@ -219,7 +113,6 @@ export async function getMukellef(id: string): Promise<Mukellef | null> {
 export async function getMukellefAuthByEmail(
   email: string,
 ): Promise<MukellefAuth | null> {
-  await ensurePortalTables();
   const normalized = normalizeEmail(email);
   const rows = await prisma.$queryRaw<MukellefRow[]>`
     SELECT * FROM "Mukellef" WHERE "email" = ${normalized}
@@ -234,7 +127,6 @@ export type MukellefListItem = Mukellef & {
 };
 
 export async function listMukellefler(): Promise<MukellefListItem[]> {
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<
     (MukellefRow & {
       openRequests: number | bigint;
@@ -270,7 +162,6 @@ export async function createMukellef(input: {
   email: string;
   note: string;
 }): Promise<WriteResult> {
-  await ensurePortalTables();
   const email = normalizeEmail(input.email);
   if (await getMukellefAuthByEmail(email)) {
     return { ok: false, error: "Bu e-posta adresiyle kayıtlı bir mükellef zaten var." };
@@ -294,7 +185,6 @@ export async function updateMukellef(
   id: string,
   input: { name: string; email: string; note: string },
 ): Promise<WriteResult> {
-  await ensurePortalTables();
   const email = normalizeEmail(input.email);
   const other = await getMukellefAuthByEmail(email);
   if (other && other.id !== id) {
@@ -315,21 +205,18 @@ export async function updateMukellef(
 }
 
 export async function setMukellefActive(id: string, active: boolean) {
-  await ensurePortalTables();
   await prisma.$executeRaw`
     UPDATE "Mukellef" SET "active" = ${active ? 1 : 0} WHERE "id" = ${id}
   `;
 }
 
 export async function setMukellefPassword(id: string, passwordHash: string) {
-  await ensurePortalTables();
   await prisma.$executeRaw`
     UPDATE "Mukellef" SET "passwordHash" = ${passwordHash} WHERE "id" = ${id}
   `;
 }
 
 export async function touchLogin(id: string) {
-  await ensurePortalTables();
   await prisma.$executeRaw`
     UPDATE "Mukellef" SET "lastLoginAt" = ${nowIso()} WHERE "id" = ${id}
   `;
@@ -337,7 +224,6 @@ export async function touchLogin(id: string) {
 
 /** Mükellefi ve tüm kayıtlarını siler (dosyaları diskten silmek çağıranın işidir). */
 export async function deleteMukellefRows(id: string) {
-  await ensurePortalTables();
   await prisma.$transaction([
     prisma.$executeRaw`DELETE FROM "PortalToken" WHERE "mukellefId" = ${id}`,
     prisma.$executeRaw`DELETE FROM "PortalFile" WHERE "mukellefId" = ${id}`,
@@ -365,7 +251,6 @@ export async function createPortalToken(
   purpose: TokenPurpose,
   ttlHours = 72,
 ): Promise<string> {
-  await ensurePortalTables();
   const token = randomBytes(32).toString("base64url");
   const now = nowIso();
   const expiresAt = new Date(Date.now() + ttlHours * 3_600_000).toISOString();
@@ -391,7 +276,6 @@ export type ValidToken = {
 /** Süresi dolmamış, kullanılmamış ve mükellefi etkin olan bağlantıyı döndürür. */
 export async function findValidToken(token: string): Promise<ValidToken | null> {
   if (!isTokenShape(token)) return null;
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<{ id: string; purpose: string; mukellefId: string }[]>`
     SELECT "id", "purpose", "mukellefId" FROM "PortalToken"
     WHERE "tokenHash" = ${hashToken(token)} AND "usedAt" = '' AND "expiresAt" > ${nowIso()}
@@ -458,7 +342,6 @@ export async function addFile(input: {
   requestId?: string;
   body?: string;
 }): Promise<PortalFileRow> {
-  await ensurePortalTables();
   const id = randomUUID();
   const createdAt = nowIso();
   await prisma.$executeRaw`
@@ -482,7 +365,6 @@ export async function addFile(input: {
 }
 
 export async function listFiles(mukellefId: string): Promise<PortalFileRow[]> {
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<FileRow[]>`
     SELECT * FROM "PortalFile" WHERE "mukellefId" = ${mukellefId}
     ORDER BY "createdAt" DESC
@@ -498,7 +380,6 @@ export async function listFilesForClient(mukellefId: string): Promise<PortalFile
 
 /** Ofisten gelen bir mesajı yalnızca mükellefin listesinden kaldırır (ofis kaydı silinmez). */
 export async function hideFileFromClient(id: string, mukellefId: string): Promise<boolean> {
-  await ensurePortalTables();
   const changed = await prisma.$executeRaw`
     UPDATE "PortalFile" SET "hiddenByClientAt" = ${nowIso()}
     WHERE "id" = ${id} AND "mukellefId" = ${mukellefId}
@@ -509,7 +390,6 @@ export async function hideFileFromClient(id: string, mukellefId: string): Promis
 
 export async function getFile(id: string): Promise<PortalFileRow | null> {
   if (!isId(id)) return null;
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<FileRow[]>`
     SELECT * FROM "PortalFile" WHERE "id" = ${id}
   `;
@@ -527,7 +407,6 @@ export async function deleteFileRow(id: string) {
 }
 
 export async function storedBytes(mukellefId: string): Promise<number> {
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<{ total: number | bigint | null }[]>`
     SELECT COALESCE(SUM("size"), 0) AS "total" FROM "PortalFile"
     WHERE "mukellefId" = ${mukellefId}
@@ -564,7 +443,6 @@ export async function addDocRequests(
   titles: string[],
   note: string,
 ): Promise<number> {
-  await ensurePortalTables();
   const existing = await prisma.$queryRaw<{ title: string }[]>`
     SELECT "title" FROM "DocRequest"
     WHERE "mukellefId" = ${mukellefId} AND "status" = 'open'
@@ -585,7 +463,6 @@ export async function addDocRequests(
 }
 
 export async function listDocRequests(mukellefId: string): Promise<DocRequestRow[]> {
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<RequestRow[]>`
     SELECT * FROM "DocRequest" WHERE "mukellefId" = ${mukellefId}
     ORDER BY "status" ASC, "createdAt" DESC
@@ -595,7 +472,6 @@ export async function listDocRequests(mukellefId: string): Promise<DocRequestRow
 
 export async function getDocRequest(id: string): Promise<DocRequestRow | null> {
   if (!isId(id)) return null;
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<RequestRow[]>`
     SELECT * FROM "DocRequest" WHERE "id" = ${id}
   `;
@@ -603,7 +479,6 @@ export async function getDocRequest(id: string): Promise<DocRequestRow | null> {
 }
 
 export async function setDocRequestStatus(id: string, status: "open" | "done") {
-  await ensurePortalTables();
   await prisma.$executeRaw`
     UPDATE "DocRequest"
     SET "status" = ${status}, "fulfilledAt" = ${status === "done" ? nowIso() : ""}
@@ -621,7 +496,6 @@ export async function fulfillDocRequest(id: string, mukellefId: string): Promise
 }
 
 export async function deleteDocRequest(id: string) {
-  await ensurePortalTables();
   await prisma.$executeRaw`DELETE FROM "DocRequest" WHERE "id" = ${id}`;
 }
 
@@ -655,7 +529,6 @@ export async function addLedgerEntry(input: {
   amountKurus: number;
   description: string;
 }) {
-  await ensurePortalTables();
   await prisma.$executeRaw`
     INSERT INTO "LedgerEntry"
       ("id", "mukellefId", "entryDate", "kind", "amountKurus", "description", "createdAt")
@@ -667,7 +540,6 @@ export async function addLedgerEntry(input: {
 
 /** Tarihe göre eskiden yeniye. */
 export async function listLedger(mukellefId: string): Promise<LedgerRow[]> {
-  await ensurePortalTables();
   const rows = await prisma.$queryRaw<LedgerDbRow[]>`
     SELECT * FROM "LedgerEntry" WHERE "mukellefId" = ${mukellefId}
     ORDER BY "entryDate" ASC, "createdAt" ASC
@@ -676,7 +548,6 @@ export async function listLedger(mukellefId: string): Promise<LedgerRow[]> {
 }
 
 export async function deleteLedgerEntry(id: string) {
-  await ensurePortalTables();
   await prisma.$executeRaw`DELETE FROM "LedgerEntry" WHERE "id" = ${id}`;
 }
 

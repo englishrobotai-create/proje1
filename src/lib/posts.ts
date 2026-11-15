@@ -1,11 +1,9 @@
 import type { Post } from "@prisma/client";
-import { ensureColumns, prisma } from "./db";
+import { prisma } from "./db";
 
 /**
  * Yazılara sonradan eklenen alanlar (SEO başlığı/açıklaması, eski adresler, yayın tarihi,
- * yazar). Post tablosunda ayrı sütunlardır ama ham SQL ile okunur/yazılır: Prisma istemcisi
- * yeniden üretilmemiş ve `prisma db push` yapılmamış olsa da çalışır (sütunlar ilk
- * kullanımda kendiliğinden eklenir).
+ * yazar). Post tablosunda ayrı sütunlardır; ham SQL ile okunur/yazılır.
  */
 export type PostExtras = {
   seoTitle: string;
@@ -62,7 +60,6 @@ function toExtras(row: ExtrasRow | undefined): PostExtras {
 
 async function readAllExtras(): Promise<Map<string, PostExtras>> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<ExtrasRow[]>`
       SELECT "id", "seoTitle", "seoDescription", "slugHistory", "publishedAt", "authorName"
       FROM "Post"
@@ -75,7 +72,6 @@ async function readAllExtras(): Promise<Map<string, PostExtras>> {
 
 export async function getPostExtras(id: string): Promise<PostExtras> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<ExtrasRow[]>`
       SELECT "id", "seoTitle", "seoDescription", "slugHistory", "publishedAt", "authorName"
       FROM "Post" WHERE "id" = ${id} LIMIT 1
@@ -87,7 +83,6 @@ export async function getPostExtras(id: string): Promise<PostExtras> {
 }
 
 export async function savePostExtras(id: string, extras: PostExtras): Promise<void> {
-  await ensureColumns();
   const history = extras.slugHistory.length > 0 ? JSON.stringify(extras.slugHistory) : "";
   await prisma.$executeRaw`
     UPDATE "Post" SET
@@ -163,10 +158,9 @@ export async function findPostBySlug(slug: string): Promise<PostLookup> {
   if (!SLUG_PATTERN.test(slug)) return { kind: "missing" };
 
   try {
-    await ensureColumns();
     const needle = `"${slug}"`;
     const rows = await prisma.$queryRaw<{ id: string }[]>`
-      SELECT "id" FROM "Post" WHERE instr("slugHistory", ${needle}) > 0 LIMIT 1
+      SELECT "id" FROM "Post" WHERE strpos("slugHistory", ${needle}) > 0 LIMIT 1
     `;
     if (rows[0]) {
       const moved = await prisma.post.findUnique({ where: { id: rows[0].id } });
@@ -181,7 +175,6 @@ export async function findPostBySlug(slug: string): Promise<PostLookup> {
 /** Yeni yazı formunda yazar alanını doldurmak için en son kullanılan yazar adı. */
 export async function getLatestAuthorName(): Promise<string> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<{ authorName: string }[]>`
       SELECT "authorName" FROM "Post" WHERE "authorName" <> '' ORDER BY "createdAt" DESC LIMIT 1
     `;

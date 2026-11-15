@@ -1,4 +1,4 @@
-import { ensureColumns, prisma } from "./db";
+import { prisma } from "./db";
 
 // Her satır bir adım: "Başlık | Açıklama"
 export const DEFAULT_SERVICES_PROCESS = [
@@ -35,7 +35,6 @@ export function parseProcessSteps(raw: string): ProcessStep[] {
  */
 export async function getServicesProcess(): Promise<string> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<{ servicesProcess: string | null }[]>`
       SELECT "servicesProcess" FROM "Setting" WHERE "id" = 'main' LIMIT 1
     `;
@@ -47,7 +46,6 @@ export async function getServicesProcess(): Promise<string> {
 }
 
 export async function saveServicesProcess(text: string): Promise<void> {
-  await ensureColumns();
   // Ayar satırı henüz yoksa oluştur (diğer ayarlar için varsayılanlar geçerli olur).
   await prisma.setting.upsert({
     where: { id: "main" },

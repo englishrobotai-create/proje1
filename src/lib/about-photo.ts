@@ -1,6 +1,13 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ensureColumns, prisma } from "./db";
+import { prisma } from "./db";
+import {
+  assertStorageReady,
+  blobEnabled,
+  blobRead,
+  blobRemove,
+  blobWrite,
+} from "./blob-storage";
 
 /**
  * Hakkımda sayfası fotoğrafı.
@@ -9,7 +16,8 @@ import { ensureColumns, prisma } from "./db";
  *   tutulur; sütun ham SQL ile okunur/yazılır (professional-info.ts ile aynı desen).
  * - Yüklenen dosya `public/` dışında, `<SITE_STORAGE_DIR | ./storage/site>/about-photo.<uzantı>`
  *   yolunda durur ve /hakkimizda/foto rotasından sunulur (derleme sonrası eklenen dosyalar için
- *   `public/` güvenilir değildir).
+ *   `public/` güvenilir değildir). Vercel'de (BLOB_READ_WRITE_TOKEN tanımlıyken) aynı dosya
+ *   özel Blob mağazasında `site/about-photo.<uzantı>` olarak tutulur (bkz. blob-storage.ts).
  * - Hiç fotoğraf yüklenmemişse `public/ornek-profil.webp` örnek illüstrasyonu gösterilir.
  */
 
@@ -57,7 +65,6 @@ export function parseAboutPhoto(raw: string | null | undefined): AboutPhoto {
 
 export async function getAboutPhoto(): Promise<AboutPhoto> {
   try {
-    await ensureColumns();
     const rows = await prisma.$queryRaw<{ aboutPhoto: string | null }[]>`
       SELECT "aboutPhoto" FROM "Setting" WHERE "id" = 'main' LIMIT 1
     `;
@@ -68,7 +75,6 @@ export async function getAboutPhoto(): Promise<AboutPhoto> {
 }
 
 export async function saveAboutPhoto(photo: AboutPhoto): Promise<void> {
-  await ensureColumns();
   await prisma.setting.upsert({
     where: { id: "main" },
     update: {},
@@ -105,6 +111,8 @@ function storageDir(): string {
 function photoPath(ext: PhotoExt): string {
   return path.join(storageDir(), `about-photo.${ext}`);
 }
+
+const blobPath = (ext: PhotoExt): string => `site/about-photo.${ext}`;
 
 function startsWith(bytes: Uint8Array, signature: number[], offset = 0): boolean {
   if (bytes.length < offset + signature.length) return false;
@@ -146,18 +154,32 @@ export async function checkPhotoUpload(file: File): Promise<PhotoCheck> {
 
 /** Yeni fotoğrafı yazar; önceki uzantıdaki dosya silinir. */
 export async function writeAboutPhotoFile(ext: PhotoExt, bytes: Buffer): Promise<void> {
+  assertStorageReady();
+  if (blobEnabled()) {
+    await removeAboutPhotoFiles();
+    await blobWrite(blobPath(ext), bytes, {
+      contentType: PHOTO_CONTENT_TYPES[ext],
+      overwrite: true,
+    });
+    return;
+  }
   await mkdir(storageDir(), { recursive: true });
   await removeAboutPhotoFiles();
   await writeFile(photoPath(ext), bytes);
 }
 
 export async function removeAboutPhotoFiles(): Promise<void> {
+  if (blobEnabled()) {
+    await Promise.all(PHOTO_EXTENSIONS.map((ext) => blobRemove(blobPath(ext))));
+    return;
+  }
   await Promise.all(
     PHOTO_EXTENSIONS.map((ext) => rm(photoPath(ext), { force: true })),
   );
 }
 
 export async function readAboutPhotoFile(ext: PhotoExt): Promise<Buffer | null> {
+  if (blobEnabled()) return blobRead(blobPath(ext));
   try {
     return await readFile(photoPath(ext));
   } catch {

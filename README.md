@@ -25,6 +25,8 @@ npm run db:setup
 npm run dev
 ```
 
+`DATABASE_URL` bir **PostgreSQL** bağlantı adresi olmalıdır (yerelde Docker/PostgreSQL ya da ücretsiz bir Neon/Supabase veritabanı). Eski SQLite (`file:./dev.db`) artık desteklenmez.
+
 Site: [http://localhost:3000](http://localhost:3000)  
 Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 
@@ -36,6 +38,25 @@ Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 İlk kurulumdan sonra Admin > Hesabım'dan e-postayı ve şifreyi değiştirin (şifre en az 10 karakter; değişince diğer cihazlardaki oturumlar kapanır). Yönetici girişi deneme sınırlıdır (IP başına 15 dakikada 20, e-posta başına 8 deneme).
 
 `.env` içindeki `AUTH_SECRET` değerini her müşteri kopyasında yenileyin (örn. `openssl rand -base64 32`; Windows'ta `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`). Canlıda (`NODE_ENV=production` ve `SITE_URL` localhost değilken) örnek değerle ya da 32 karakterden kısa bir `AUTH_SECRET` ile yönetici ve mükellef girişi çalışmaz; uygulama açık bir hata verir.
+
+## Vercel'e yayın
+
+Proje Vercel'de çalışır; SQLite yerine PostgreSQL, diske yazma yerine Vercel Blob kullanır.
+
+1. **Veritabanı:** Vercel projesinde *Storage* sekmesinden bir Postgres (Neon) ekleyin. `DATABASE_URL` (ve havuzsuz `DATABASE_URL_UNPOOLED`) otomatik eklenir. Üretim derlemesi şemayı `prisma db push` ile kendisi oluşturur/günceller (`scripts/vercel-db-sync.mjs`); önizleme derlemeleri şemaya dokunmaz.
+2. **Dosyalar:** *Storage* sekmesinden **Private** bir Blob mağazası ekleyin (`BLOB_READ_WRITE_TOKEN` otomatik eklenir). Mükellef belgeleri gizli olduğundan mağaza mutlaka *private* olmalıdır. Vercel işlevlerinin istek gövdesi sınırı 4,5 MB olduğu için burada tek dosya en çok **4 MB** yüklenebilir (daha büyük dosyalar için doğrudan istemci yüklemesi gerekir).
+3. **Ortam değişkenleri:** `AUTH_SECRET` (en az 32 karakter, rastgele) ve `SITE_URL` (örn. `https://musteri-alanadi.com`) değerlerini *Settings > Environment Variables* bölümüne ekleyin; SMTP değişkenleri isteğe bağlıdır (`.env.example`).
+4. **İlk yönetici hesabı:** Veritabanı boşken bir kez, kendi bilgilerinizle çalıştırın (varsayılan şifreyi hiç kullanmamak için):
+   ```bash
+   ADMIN_EMAIL="siz@ofis.com" ADMIN_PASSWORD="en-az-10-karakter" DATABASE_URL="<Vercel'deki bağlantı adresi>" npm run db:seed
+   ```
+   Windows PowerShell:
+   ```powershell
+   $env:ADMIN_EMAIL="siz@ofis.com"; $env:ADMIN_PASSWORD="en-az-10-karakter"; $env:DATABASE_URL="<Vercel'deki bağlantı adresi>"; npm run db:seed
+   ```
+   Not: `db:seed` Hakkımda/İletişim gibi ayarları da varsayılanlara döndürür; yalnızca ilk kurulumda çalıştırın.
+
+Vercel dışında (VPS, yerel) `BLOB_READ_WRITE_TOKEN` tanımlı değilse dosyalar diskte tutulur (`PORTAL_STORAGE_DIR`, `SITE_STORAGE_DIR`), şemayı `npm run db:setup` kurar.
 
 ## Müşteriye teslim (ayrı kopya)
 
@@ -66,6 +87,6 @@ Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 
 Not: `package.json`'a `nodemailer` eklendi; mevcut kopyalarda `npm install` çalıştırın.
 
-Not: "Nasıl çalışıyoruz" metni `Setting` tablosundaki `servicesProcess` sütununda tutulur. Mesleki bilgiler `professionalInfo`, KVKK alanları `kvkkInfo` sütununda (JSON) tutulur. Blog yazılarının `seoTitle`, `seoDescription`, `slugHistory`, `publishedAt`, `authorName` alanları `Post` tablosundadır. Sütunlar şemada tanımlıdır; `prisma db push` yapılmamış eski bir veritabanında uygulama ilk kullanımda sütunları kendisi ekler.
+Not: "Nasıl çalışıyoruz" metni `Setting` tablosundaki `servicesProcess` sütununda tutulur. Mesleki bilgiler `professionalInfo`, KVKK alanları `kvkkInfo` sütununda (JSON) tutulur. Blog yazılarının `seoTitle`, `seoDescription`, `slugHistory`, `publishedAt`, `authorName` alanları `Post` tablosundadır. Sütunlar şemada tanımlıdır ve `prisma db push` ile oluşturulur.
 
-Not: Mükellef Köşesi tabloları (`Mukellef`, `PortalToken`, `PortalFile`, `DocRequest`, `LedgerEntry`) ve `Setting.portalEnabled` sütunu da ilk kullanımda kendiliğinden oluşturulur; şemada (`prisma/schema.prisma`) tanımlıdır, `prisma db push` yapılırsa çakışmaz. Mükellef oturumu yönetici oturumundan ayrıdır: ayrı çerez (`mm_mukellef`, yalnızca `/mukellef` yoluna gider), `AUTH_SECRET`'tan türetilmiş ayrı imza anahtarı; yönetici ve mükellef oturumları birbirine yetki vermez. `AUTH_SECRET`'ı değiştirmek tüm mükellef oturumlarını da düşürür.
+Not: Mükellef Köşesi tabloları (`Mukellef`, `PortalToken`, `PortalFile`, `DocRequest`, `LedgerEntry`) ve `Setting.portalEnabled` sütunu da şemada (`prisma/schema.prisma`) tanımlıdır ve `prisma db push` ile oluşturulur. Mükellef oturumu yönetici oturumundan ayrıdır: ayrı çerez (`mm_mukellef`, yalnızca `/mukellef` yoluna gider), `AUTH_SECRET`'tan türetilmiş ayrı imza anahtarı; yönetici ve mükellef oturumları birbirine yetki vermez. `AUTH_SECRET`'ı değiştirmek tüm mükellef oturumlarını da düşürür.
