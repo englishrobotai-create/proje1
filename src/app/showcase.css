@@ -385,6 +385,32 @@ a.ht-item:hover {
   transform: rotate(-6deg) scale(1.07);
 }
 
+/* Başlığın yazı tipi/boyutu Ayarlar'dan değiştirildiyse (data-title-custom, bkz. (site)/layout.tsx)
+   uzun başlık menüyü ve butonu sıkıştırmasın, gerekirse ikinci satıra geçsin.
+   Ayar varsayılandayken bu kurallar devreye girmez; mevcut görünüm aynen kalır. */
+[data-title-custom] .brand {
+  white-space: normal;
+}
+
+[data-title-custom] .brand-mark {
+  flex: none;
+}
+
+[data-title-custom] .brand-text {
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/* Başlık birden çok satıra geçince üst/alt kenara yapışmasın. */
+[data-title-custom] .header-inner {
+  padding-block: 10px;
+}
+
+[data-title-custom] .nav,
+[data-title-custom] .header-right {
+  flex-shrink: 0;
+}
+
 .nav {
   flex-wrap: nowrap;
   gap: 0.15rem;
@@ -641,7 +667,7 @@ a.ht-item:hover {
 
 .sc-footer-brand .footer-brand {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: calc(1.6rem * var(--title-scale, 1));
 }
 
 .sc-footer-brand .brand-mark {

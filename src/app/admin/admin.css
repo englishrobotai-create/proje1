@@ -253,3 +253,29 @@
     align-items: flex-start;
   }
 }
+
+
+/* Site Ayarları: başlık yazı tipi/boyutu önizlemesi. */
+.title-preview-label {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--steel, #5b6b7d);
+}
+
+.title-preview {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.title-preview-light {
+  background: #f8fafb;
+  border: 1px solid #d2dee7;
+  color: var(--ink, #16294a);
+}
+
+.title-preview-dark {
+  background: #0e1b30;
+  color: #fff;
+}

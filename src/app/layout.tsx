@@ -1,5 +1,16 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, Newsreader } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Hanken_Grotesk,
+  Inter,
+  Lora,
+  Merriweather,
+  Montserrat,
+  Newsreader,
+  Playfair_Display,
+  Poppins,
+  Raleway,
+} from "next/font/google";
 import { defaultOgImage, getSiteUrl } from "@/lib/seo";
 import { getSiteSettings } from "@/lib/settings";
 import "./globals.css";
@@ -18,6 +29,67 @@ const body = Hanken_Grotesk({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
 });
+
+// Site başlığı için Ayarlar'dan seçilebilen ek yazı tipleri (bkz. src/lib/title-fonts.ts).
+// preload: false → seçilmeyen yazı tipleri için sayfa başına ön yükleme yapılmaz; tarayıcı yalnızca
+// sayfada gerçekten kullanılan yazı tipinin dosyasını indirir.
+// Not: next/font seçenekleri doğrudan yazılmış (literal) değerler olmalıdır; ortak bir nesne
+// yayılarak (spread) verilemez.
+const titlePlayfair = Playfair_Display({
+  variable: "--font-title-playfair",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleMerriweather = Merriweather({
+  variable: "--font-title-merriweather",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleLora = Lora({
+  variable: "--font-title-lora",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleCormorant = Cormorant_Garamond({
+  variable: "--font-title-cormorant",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleInter = Inter({
+  variable: "--font-title-inter",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleMontserrat = Montserrat({
+  variable: "--font-title-montserrat",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+const titleRaleway = Raleway({
+  variable: "--font-title-raleway",
+  subsets: ["latin", "latin-ext"],
+  preload: false,
+});
+// Poppins değişken yazı tipi değildir; başlıkta kullanılan kalınlıklar belirtilmelidir.
+const titlePoppins = Poppins({
+  variable: "--font-title-poppins",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600"],
+  preload: false,
+});
+
+const titleFontVariables = [
+  titlePlayfair,
+  titleMerriweather,
+  titleLora,
+  titleCormorant,
+  titleInter,
+  titleMontserrat,
+  titleRaleway,
+  titlePoppins,
+]
+  .map((font) => font.variable)
+  .join(" ");
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteTitle } = await getSiteSettings();
@@ -61,7 +133,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${display.variable} ${body.variable} h-full`}
+      className={`${display.variable} ${body.variable} ${titleFontVariables} h-full`}
       suppressHydrationWarning
     >
       <head>

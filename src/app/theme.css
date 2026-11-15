@@ -28,7 +28,7 @@
 }
 
 .brand-text {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--title-font, var(--font-display), Georgia, serif);
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--ink);

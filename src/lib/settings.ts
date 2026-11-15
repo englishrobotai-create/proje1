@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { DEFAULT_NEWS_URL } from "./external-news";
 import { isRealSocialUrl } from "./social-links";
+import { normalizeTitleFont, normalizeTitleScale } from "./title-fonts";
 
 export type SiteSettings = {
   siteTitle: string;
@@ -26,6 +27,10 @@ export type SiteSettings = {
   contactAddress: string;
   contactHours: string;
   servicesIntro: string;
+  /** Site başlığı yazı tipi anahtarı (src/lib/title-fonts.ts); boş = tema varsayılanı. */
+  titleFont: string;
+  /** Site başlığı boyutu, varsayılanın yüzdesi (70–150). */
+  titleScale: number;
 };
 
 /** Ayar girilmemişse sitede görünen yer tutucu iletişim bilgileri (gerçek bilgi değildir). */
@@ -82,6 +87,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     servicesIntro:
       setting?.servicesIntro ||
       "Standart hizmet paketimiz, mali müşavirlik ofisinizin temel ihtiyaçlarını kapsayacak şekilde hazırlanmıştır.",
+    titleFont: normalizeTitleFont(setting?.titleFont),
+    titleScale: normalizeTitleScale(setting?.titleScale),
   };
 }
 

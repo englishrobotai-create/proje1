@@ -111,8 +111,8 @@ img {
 }
 
 .brand-text {
-  font-family: var(--font-display), serif;
-  font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+  font-family: var(--title-font, var(--font-display), serif);
+  font-size: calc(clamp(1.35rem, 2.2vw, 1.7rem) * var(--title-scale, 1));
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -1238,8 +1238,8 @@ textarea:focus {
 }
 
 .footer-brand {
-  font-family: var(--font-display), serif;
-  font-size: 1.85rem;
+  font-family: var(--title-font, var(--font-display), serif);
+  font-size: calc(1.85rem * var(--title-scale, 1));
   margin: 0 0 0.75rem;
   color: var(--white);
 }
@@ -1490,7 +1490,7 @@ textarea:focus {
 
 @media (max-width: 420px) {
   .brand-text {
-    font-size: 1.15rem;
+    font-size: calc(1.15rem * var(--title-scale, 1));
   }
 }
 

@@ -48,6 +48,10 @@ model Setting {
   aboutPhoto       String @default("") // Hakkımda fotoğrafı: JSON {show, ext, v}
   portalEnabled    Int    @default(0) // Mükellef Köşesi açık mı (0/1)
 
+  // Site başlığının (üst menü ve alt bilgi) görünümü. Boş yazı tipi = tema varsayılanı.
+  titleFont  String @default("") // src/lib/title-fonts.ts içindeki anahtarlardan biri
+  titleScale Int    @default(100) // varsayılan boyutun yüzdesi (70–150)
+
   updatedAt DateTime @updatedAt
 }
 

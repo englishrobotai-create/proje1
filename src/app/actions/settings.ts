@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+  TITLE_SCALE_MAX,
+  TITLE_SCALE_MIN,
+  isTitleFontKey,
+} from "@/lib/title-fonts";
 
 const optionalUrl = z
   .string()
@@ -28,6 +33,18 @@ const schema = z.object({
   whatsapp: optionalUrl,
   externalNewsUrl: optionalUrl,
   externalNewsLabel: z.string().trim().max(80),
+  // Başlık görünümü yalnızca Site Ayarları formundan gelir. Sosyal Medya formu gibi bu alanları
+  // göndermeyen formlar mevcut değeri bozmasın diye ikisi de isteğe bağlıdır (yoksa güncellenmez).
+  titleFont: z
+    .string()
+    .refine(isTitleFontKey, "Geçersiz yazı tipi seçildi")
+    .optional(),
+  titleScale: z
+    .number("Başlık boyutu bir sayı olmalı")
+    .int("Başlık boyutu tam sayı olmalı")
+    .min(TITLE_SCALE_MIN, `Başlık boyutu en az %${TITLE_SCALE_MIN} olabilir`)
+    .max(TITLE_SCALE_MAX, `Başlık boyutu en fazla %${TITLE_SCALE_MAX} olabilir`)
+    .optional(),
 });
 
 export type SettingsState = {
@@ -45,6 +62,9 @@ export async function updateSettingsAction(
     return { error: "Oturum gerekli" };
   }
 
+  const titleFontRaw = formData.get("titleFont");
+  const titleScaleRaw = formData.get("titleScale");
+
   const parsed = schema.safeParse({
     siteTitle: formData.get("siteTitle"),
     facebook: formData.get("facebook") ?? "",
@@ -55,6 +75,11 @@ export async function updateSettingsAction(
     whatsapp: formData.get("whatsapp") ?? "",
     externalNewsUrl: formData.get("externalNewsUrl") ?? "",
     externalNewsLabel: formData.get("externalNewsLabel") ?? "",
+    titleFont: typeof titleFontRaw === "string" ? titleFontRaw : undefined,
+    titleScale:
+      typeof titleScaleRaw === "string" && titleScaleRaw.trim() !== ""
+        ? Number(titleScaleRaw)
+        : undefined,
   });
 
   if (!parsed.success) {
