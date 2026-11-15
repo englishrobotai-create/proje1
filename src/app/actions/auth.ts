@@ -2,7 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { destroySession, loginWithCredentials } from "@/lib/auth";
+import {
+  allowAdminLoginAttempt,
+  destroySession,
+  loginWithCredentials,
+} from "@/lib/auth";
 
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta girin"),
@@ -24,6 +28,12 @@ export async function loginAction(
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Geçersiz form" };
+  }
+
+  if (!(await allowAdminLoginAttempt(parsed.data.email))) {
+    return {
+      error: "Çok fazla deneme yaptınız. Lütfen 15 dakika sonra tekrar deneyin.",
+    };
   }
 
   const user = await loginWithCredentials(

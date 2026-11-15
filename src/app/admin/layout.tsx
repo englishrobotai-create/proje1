@@ -34,6 +34,7 @@ export default async function AdminLayout({
           <Link href="/admin/mesajlar">Mesajlar</Link>
           <Link href="/admin/mukellefler">Mükellefler</Link>
           <Link href="/admin/ayarlar">Ayarlar</Link>
+          <Link href="/admin/hesap">Hesabım</Link>
           <Link href="/" target="_blank">
             Siteyi Gör
           </Link>

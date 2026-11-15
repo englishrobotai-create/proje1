@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { deleteServiceAction } from "@/app/actions/services";
 import { ServicesIntroForm } from "@/components/admin/ServicesIntroForm";
 import { ServicesProcessForm } from "@/components/admin/ServicesProcessForm";
+import { ConfirmButton } from "@/components/portal/ConfirmButton";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getServicesProcess } from "@/lib/services-process";
@@ -66,13 +67,13 @@ export default async function AdminServicesPage() {
                         Düzenle
                       </Link>
                       <form action={deleteServiceAction.bind(null, service.id)}>
-                        <button
-                          type="submit"
+                        <ConfirmButton
+                          message={`“${service.title}” hizmeti silinsin mi? Bu işlem geri alınamaz.`}
                           className="btn btn-danger"
                           style={{ padding: "0.45rem 0.8rem" }}
                         >
                           Sil
-                        </button>
+                        </ConfirmButton>
                       </form>
                     </div>
                   </td>

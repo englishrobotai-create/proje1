@@ -12,6 +12,9 @@ export type ExternalNewsItem = {
 
 const DEFAULT_NEWS_URL = "https://www.ozcankutlu.com/api/news";
 
+// Haber kaynağı yavaşlarsa/takılırsa ana sayfa üretimi beklemesin; süre dolunca boş liste döner.
+const NEWS_TIMEOUT_MS = 3000;
+
 type ApiNewsItem = {
   id?: string;
   title?: string;
@@ -82,6 +85,7 @@ export async function fetchExternalNews(
   try {
     const response = await fetch(url, {
       next: { revalidate: 1800 },
+      signal: AbortSignal.timeout(NEWS_TIMEOUT_MS),
       headers: {
         Accept: "application/json",
         "User-Agent": "Proje1NewsBot/1.0",

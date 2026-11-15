@@ -32,7 +32,9 @@ Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 - E-posta: `admin@ornek.com`
 - Şifre: `Admin123!`
 
-İlk kurulumdan sonra şifreyi değiştirin. `.env` içindeki `AUTH_SECRET` değerini de her müşteri kopyasında yenileyin.
+İlk kurulumdan sonra Admin > Hesabım'dan e-postayı ve şifreyi değiştirin (şifre en az 10 karakter; değişince diğer cihazlardaki oturumlar kapanır). Yönetici girişi deneme sınırlıdır (IP başına 15 dakikada 20, e-posta başına 8 deneme).
+
+`.env` içindeki `AUTH_SECRET` değerini her müşteri kopyasında yenileyin (örn. `openssl rand -base64 32`; Windows'ta `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`). Canlıda (`NODE_ENV=production` ve `SITE_URL` localhost değilken) örnek değerle ya da 32 karakterden kısa bir `AUTH_SECRET` ile yönetici ve mükellef girişi çalışmaz; uygulama açık bir hata verir.
 
 ## Müşteriye teslim (ayrı kopya)
 
@@ -40,7 +42,7 @@ Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
 2. Yeni `.env` oluşturun (`AUTH_SECRET` ve müşterinin alan adıyla `SITE_URL` değerlerini yazın)
 3. `npm install` ve `npm run db:setup` çalıştırın
 4. Hostinge alın (`npm run build` + `npm run start`)
-5. Admin şifresini ve site başlığını müşteriyle güncelleyin (Admin > Ayarlar). Varsayılan başlık "SMMM Ad Soyad" yer tutucudur; müşterinin gerçek adı yazılmadan yayına almayın. Dikkat: `npm run db:seed` Hakkımda/İletişim metinlerini ve başlığı varsayılana geri yazar; müşterinin sitesi özelleştirildikten sonra seed'i yeniden çalıştırmayın
+5. Admin şifresini (Admin > Hesabım) ve site başlığını (Admin > Ayarlar) müşteriyle güncelleyin. Varsayılan başlık "SMMM Ad Soyad" yer tutucudur; müşterinin gerçek adı yazılmadan yayına almayın. Dikkat: `npm run db:seed` Hakkımda/İletişim metinlerini ve başlığı varsayılana geri yazar; müşterinin sitesi özelleştirildikten sonra seed'i yeniden çalıştırmayın
 6. Yer tutucu iletişim bilgilerini (e-posta, telefon, adres) ve hizmet/hakkında metinlerini müşteriye özel yazın; yer tutucular arama motorlarına verilmez ama sitede görünür
 7. Admin > Hizmetler'den "Nasıl çalışıyoruz" adımlarını müşterinin kendi çalışma düzenine göre yazın
 8. Admin > İletişim > Mesleki Bilgiler'i müşterinin bilgileriyle doldurun. SMMM/YMM Haksız Rekabet ve Reklam Yasağı Yönetmeliği'nin 22. maddesi sitede bu bilgilerin bulunmasını, sitenin odaya bildirilmesini ve meslek unvanı uzantılı bir `.tr` alan adı kullanılmasını ister. Kuralın müşteriye nasıl uygulandığını müşterinin bağlı olduğu oda doğrulamalıdır; bu proje bir uygunluk garantisi vermez.

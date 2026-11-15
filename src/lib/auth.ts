@@ -1,16 +1,18 @@
-import { cookies } from "next/headers";
+import { createHash } from "node:crypto";
+import { cookies, headers } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { getAuthSecret } from "./auth-secret";
+import { allowRequest } from "./rate-limit";
 
 const COOKIE_NAME = "mm_session";
 
+// Kayıtsız e-postayla yapılan denemeler de gerçek hesapla aynı sürede sonuçlansın.
+const DUMMY_HASH = bcrypt.hashSync("kayitsiz-hesap-karsilastirmasi", 10);
+
 function getSecret() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) {
-    throw new Error("AUTH_SECRET tanımlı değil");
-  }
-  return new TextEncoder().encode(secret);
+  return new TextEncoder().encode(getAuthSecret());
 }
 
 export type SessionUser = {
@@ -27,11 +29,16 @@ export async function verifyPassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
-export async function createSession(user: SessionUser) {
+/** Şifre değişince eski oturumlar düşsün diye jetona şifre özetinin bir parçası konur. */
+const passwordStamp = (passwordHash: string) =>
+  createHash("sha256").update(passwordHash).digest("hex").slice(0, 16);
+
+export async function createSession(user: SessionUser, passwordHash: string) {
   const token = await new SignJWT({
     id: user.id,
     email: user.email,
     name: user.name,
+    v: passwordStamp(passwordHash),
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -58,8 +65,11 @@ export async function getSession(): Promise<SessionUser | null> {
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
 
+  // Anahtar güvensizse sessizce "oturum yok" demek yerine açık hata versin.
+  const secret = getSecret();
+
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, secret);
     if (
       typeof payload.id !== "string" ||
       typeof payload.email !== "string" ||
@@ -67,6 +77,19 @@ export async function getSession(): Promise<SessionUser | null> {
     ) {
       return null;
     }
+
+    // Parmak izi olan oturumlar her istekte veritabanıyla doğrulanır: hesap silindiyse ya da
+    // şifre değiştiyse oturum düşer. Parmak izi olmayanlar bu özellikten önce açılmış eski
+    // oturumlardır; en geç 7 gün içinde kendiliğinden sona erer.
+    if (typeof payload.v === "string") {
+      const user = await prisma.user.findUnique({
+        where: { id: payload.id },
+        select: { id: true, email: true, name: true, passwordHash: true },
+      });
+      if (!user || passwordStamp(user.passwordHash) !== payload.v) return null;
+      return { id: user.id, email: user.email, name: user.name };
+    }
+
     return {
       id: payload.id,
       email: payload.email,
@@ -85,18 +108,53 @@ export async function requireSession() {
   return session;
 }
 
-export async function loginWithCredentials(email: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return null;
+async function clientIp(): Promise<string> {
+  const requestHeaders = await headers();
+  return (
+    requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    requestHeaders.get("x-real-ip")?.trim() ||
+    "unknown"
+  );
+}
 
-  const ok = await verifyPassword(password, user.passwordHash);
-  if (!ok) return null;
+/**
+ * Yönetici girişi hız sınırı: IP başına 15 dakikada 20, e-posta başına 15 dakikada 8 deneme.
+ * (Adres alınamazsa herkes aynı kovaya düşer; sınır bu yüzden geniştir.)
+ */
+export async function allowAdminLoginAttempt(email: string): Promise<boolean> {
+  const ip = await clientIp();
+  const perIp = allowRequest(
+    `admin-ip:${ip}`,
+    ip === "unknown" ? 60 : 20,
+    15 * 60_000,
+  );
+  const perEmail = allowRequest(
+    `admin-mail:${email.trim().toLowerCase()}`,
+    8,
+    15 * 60_000,
+  );
+  return perIp && perEmail;
+}
+
+/** Hesap sayfasında mevcut şifre denemeleri: oturum sahibi başına 15 dakikada 5. */
+export function allowAdminAccountAttempt(userId: string): boolean {
+  return allowRequest(`admin-account:${userId}`, 5, 15 * 60_000);
+}
+
+export async function loginWithCredentials(email: string, password: string) {
+  const user = await prisma.user.findUnique({
+    where: { email: email.trim().toLowerCase() },
+  });
+
+  // Kullanıcı yoksa da aynı sürede bir karşılaştırma yapılır (hesap var mı bilgisi sızmasın).
+  const ok = await verifyPassword(password, user?.passwordHash ?? DUMMY_HASH);
+  if (!user || !ok) return null;
 
   const sessionUser: SessionUser = {
     id: user.id,
     email: user.email,
     name: user.name,
   };
-  await createSession(sessionUser);
+  await createSession(sessionUser, user.passwordHash);
   return sessionUser;
 }

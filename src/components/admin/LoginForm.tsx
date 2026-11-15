@@ -16,7 +16,6 @@ export function LoginForm() {
           name="email"
           type="email"
           required
-          defaultValue="admin@ornek.com"
           autoComplete="username"
         />
       </label>

@@ -10,6 +10,7 @@ import {
   type MukellefAuth,
 } from "./portal-db";
 import { allowRequest } from "./rate-limit";
+import { getAuthSecret } from "./auth-secret";
 
 /**
  * Mükellef oturumu. Yönetici oturumundan (auth.ts) bilinçli olarak ayrıdır:
@@ -25,8 +26,7 @@ const AUDIENCE = "mukellef-portal";
 const SESSION_SECONDS = 60 * 60 * 12;
 
 function getPortalKey(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) throw new Error("AUTH_SECRET tanımlı değil");
+  const secret = getAuthSecret();
   return new TextEncoder().encode(
     createHash("sha256").update(`mukellef:${secret}`).digest("hex"),
   );

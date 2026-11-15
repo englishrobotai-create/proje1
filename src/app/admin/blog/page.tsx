@@ -4,6 +4,7 @@ import {
   deletePostAction,
   togglePostPublishedAction,
 } from "@/app/actions/posts";
+import { ConfirmButton } from "@/components/portal/ConfirmButton";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -66,13 +67,13 @@ export default async function AdminBlogPage() {
                         </button>
                       </form>
                       <form action={deletePostAction.bind(null, post.id)}>
-                        <button
-                          type="submit"
+                        <ConfirmButton
+                          message={`“${post.title}” yazısı kalıcı olarak silinsin mi? Bu işlem geri alınamaz.`}
                           className="btn btn-danger"
                           style={{ padding: "0.45rem 0.8rem" }}
                         >
                           Sil
-                        </button>
+                        </ConfirmButton>
                       </form>
                     </div>
                   </td>

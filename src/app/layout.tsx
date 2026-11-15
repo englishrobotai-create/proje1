@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = getSiteUrl();
   const ogImage = defaultOgImage();
   const description =
-    "Mali müşavirlik, muhasebe, vergi danışmanlığı ve şirket kuruluş hizmetleri.";
+    "Mali müşavirlik, muhasebe, vergi danışmanlığı, bordro ve şirket kuruluş hizmetleri. Vergi takvimini kaçırmadan, şeffaf raporlama ile yanınızdayız.";
 
   return {
     // metadataBase yalnızca SITE_URL biliniyorsa verilir (göreli adresler için gerekli).

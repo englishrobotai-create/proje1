@@ -4,17 +4,18 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash("Admin123!", 10);
-
-  await prisma.user.upsert({
-    where: { email: "admin@ornek.com" },
-    update: {},
-    create: {
-      email: "admin@ornek.com",
-      name: "Site Yöneticisi",
-      passwordHash,
-    },
-  });
+  // Yönetici e-postası Admin > Hesabım'dan değiştirilebildiği için varsayılan yönetici yalnızca
+  // hiç kullanıcı yoksa oluşturulur; aksi halde seed yeniden çalışınca varsayılan şifreli
+  // ikinci bir yönetici doğardı.
+  if ((await prisma.user.count()) === 0) {
+    await prisma.user.create({
+      data: {
+        email: "admin@ornek.com",
+        name: "Site Yöneticisi",
+        passwordHash: await bcrypt.hash("Admin123!", 10),
+      },
+    });
+  }
 
   const siteTitle = "SMMM Ad Soyad";
 

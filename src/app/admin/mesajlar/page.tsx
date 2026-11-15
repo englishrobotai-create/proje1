@@ -4,6 +4,7 @@ import {
   markMessageReadAction,
 } from "@/app/actions/messages";
 import { MailStatusPanel } from "@/components/admin/MailStatusPanel";
+import { ConfirmButton } from "@/components/portal/ConfirmButton";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getMailStatus } from "@/lib/mail";
@@ -79,13 +80,13 @@ export default async function AdminMessagesPage() {
                         </form>
                       ) : null}
                       <form action={deleteMessageAction.bind(null, message.id)}>
-                        <button
-                          type="submit"
+                        <ConfirmButton
+                          message={"Bu mesaj kalıcı olarak silinsin mi? Bu işlem geri alınamaz."}
                           className="btn btn-danger"
                           style={{ padding: "0.45rem 0.8rem" }}
                         >
                           Sil
-                        </button>
+                        </ConfirmButton>
                       </form>
                     </div>
                   </td>
