@@ -67,7 +67,7 @@ export async function updateSettingsAction(
       parsed.data.externalNewsUrl || "https://www.ozcankutlu.com/api/news",
     externalNewsLabel:
       parsed.data.externalNewsLabel ||
-      "Özcan Kutlu — Güncel Mali Gelişmeler",
+      "Güncel Mali Gelişmeler",
   };
 
   await prisma.setting.upsert({

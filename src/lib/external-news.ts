@@ -32,10 +32,25 @@ type ApiNewsResponse = {
   data?: ApiNewsItem[];
 };
 
-function formatDateLabel(value?: string) {
-  if (!value) return "";
-  const date = new Date(value.includes("T") ? value : `${value}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return value;
+// Haber akışında tarihler farklı biçimlerde gelebiliyor:
+// "2026-11-10", "2026-11-09T16:57:45.398Z" ve "10.07.2025" (gg.aa.yyyy).
+function parseNewsDate(value?: string): Date | null {
+  if (!value) return null;
+  const text = value.trim();
+
+  const dotted = text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (dotted) {
+    const [, day, month, year] = dotted;
+    const date = new Date(Number(year), Number(month) - 1, Number(day), 12);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const date = new Date(text.includes("T") ? text : `${text}T12:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatDateLabel(date: Date | null) {
+  if (!date) return "";
   return date.toLocaleDateString("tr-TR", {
     day: "numeric",
     month: "long",
@@ -44,14 +59,23 @@ function formatDateLabel(value?: string) {
 }
 
 function badgeFor(kind?: string) {
-  if (kind === "deadline") return "SON TARİH";
-  if (kind === "alert") return "UYARI";
-  return "GÜNCEL";
+  if (kind === "deadline") return "Son tarih";
+  if (kind === "alert") return "Uyarı";
+  return "Güncel";
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Haberleri çeker; yalnızca son `maxAgeDays` gün içinde yayımlananları,
+ * en yeniden eskiye sıralayıp en fazla `limit` adet döndürür.
+ * Yayın tarihi (publishedAt) esas alınır; yoksa effectiveDate kullanılır.
+ * Tarihi okunamayan haber, güncelliği doğrulanamadığı için dışarıda kalır.
+ */
 export async function fetchExternalNews(
   sourceUrl = DEFAULT_NEWS_URL,
-  limit = 20,
+  limit = 5,
+  maxAgeDays = 30,
 ): Promise<ExternalNewsItem[]> {
   const url = sourceUrl.trim() || DEFAULT_NEWS_URL;
 
@@ -69,7 +93,22 @@ export async function fetchExternalNews(
     const payload = (await response.json()) as ApiNewsResponse;
     const rows = Array.isArray(payload.data) ? payload.data : [];
 
-    return rows.slice(0, limit).map((item, index) => {
+    const cutoff = Date.now() - maxAgeDays * DAY_MS;
+
+    const fresh = rows
+      .map((item, index) => ({
+        item,
+        index,
+        date: parseNewsDate(item.publishedAt) ?? parseNewsDate(item.effectiveDate),
+      }))
+      .filter(
+        (entry): entry is typeof entry & { date: Date } =>
+          entry.date !== null && entry.date.getTime() >= cutoff,
+      )
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+      .slice(0, limit);
+
+    return fresh.map(({ item, index, date }) => {
       const href =
         item.disableSourceLink
           ? ""
@@ -79,7 +118,7 @@ export async function fetchExternalNews(
         id: item.id || `news-${index}`,
         title: item.title?.trim() || "Güncel mali gelişme",
         summary: (item.summary || item.analysis || "").trim(),
-        dateLabel: formatDateLabel(item.effectiveDate || item.publishedAt),
+        dateLabel: formatDateLabel(date),
         source: item.primarySource || item.sources?.[0]?.name || "Resmi kaynak",
         href,
         kind: item.kind || "news",

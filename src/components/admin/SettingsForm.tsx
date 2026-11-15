@@ -50,7 +50,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <input
             name="externalNewsLabel"
             maxLength={80}
-            placeholder="Özcan Kutlu — Güncel Mali Gelişmeler"
+            placeholder="Güncel Mali Gelişmeler"
             defaultValue={settings.externalNewsLabel}
           />
         </label>

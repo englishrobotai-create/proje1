@@ -2,17 +2,20 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { deleteServiceAction } from "@/app/actions/services";
 import { ServicesIntroForm } from "@/components/admin/ServicesIntroForm";
+import { ServicesProcessForm } from "@/components/admin/ServicesProcessForm";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getServicesProcess } from "@/lib/services-process";
 import { getSiteSettings } from "@/lib/settings";
 
 export default async function AdminServicesPage() {
   const session = await getSession();
   if (!session) redirect("/admin/giris");
 
-  const [settings, services] = await Promise.all([
+  const [settings, services, processText] = await Promise.all([
     getSiteSettings(),
     prisma.service.findMany({ orderBy: { sortOrder: "asc" } }),
+    getServicesProcess(),
   ]);
 
   return (
@@ -26,6 +29,10 @@ export default async function AdminServicesPage() {
 
       <div className="admin-panel" style={{ maxWidth: 760, marginBottom: "1rem" }}>
         <ServicesIntroForm intro={settings.servicesIntro} />
+      </div>
+
+      <div className="admin-panel" style={{ maxWidth: 760, marginBottom: "1rem" }}>
+        <ServicesProcessForm process={processText} />
       </div>
 
       <div className="admin-panel">

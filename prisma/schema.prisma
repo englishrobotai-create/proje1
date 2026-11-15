@@ -25,7 +25,7 @@ model Setting {
   youtube           String   @default("")
   whatsapp          String   @default("")
   externalNewsUrl   String   @default("https://www.ozcankutlu.com/api/news")
-  externalNewsLabel String   @default("Özcan Kutlu — Güncel Mali Gelişmeler")
+  externalNewsLabel String   @default("Güncel Mali Gelişmeler")
 
   aboutIntro          String @default("")
   aboutApproachTitle  String @default("Çalışma yaklaşımımız")
@@ -42,6 +42,11 @@ model Setting {
   contactAddress   String @default("İstanbul, Türkiye")
   contactHours     String @default("Hafta içi 09:00 – 18:00")
   servicesIntro    String @default("Standart hizmet paketimiz, mali müşavirlik ofisinizin temel ihtiyaçlarını kapsayacak şekilde hazırlanmıştır.")
+  servicesProcess  String @default("")
+  professionalInfo String @default("")
+  kvkkInfo         String @default("")
+  aboutPhoto       String @default("") // Hakkımda fotoğrafı: JSON {show, ext, v}
+  portalEnabled    Int    @default(0) // Mükellef Köşesi açık mı (0/1)
 
   updatedAt DateTime @updatedAt
 }
@@ -64,6 +69,13 @@ model Post {
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Sonradan eklenen alanlar (kendiliğinden eklenir; ham SQL ile okunup yazılır).
+  seoTitle       String @default("") // boşsa başlık kullanılır
+  seoDescription String @default("") // boşsa özet kullanılır
+  slugHistory    String @default("") // eski adresler (JSON dizi); eski adres yeniye yönlenir
+  publishedAt    String @default("") // ilk yayın tarihi (ISO metin); boşsa createdAt
+  authorName     String @default("") // boşsa yazar olarak ofis adı kullanılır
 }
 
 model Message {
@@ -75,4 +87,77 @@ model Message {
   body      String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+// ---- Mükellef Köşesi ----------------------------------------------------------------
+// Bu tablolar ilk kullanımda kendiliğinden oluşturulur (src/lib/portal-db.ts) ve ham SQL ile
+// okunur/yazılır; burada tanımlı olmaları `prisma db push` yapıldığında şemayla çakışmamaları
+// içindir. Tarihler ISO metin, tutarlar tam sayı kuruştur. İlişkiler bilinçli olarak
+// tanımlanmamıştır (silme işlemleri uygulama kodunda yapılır).
+
+model Mukellef {
+  id           String @id
+  name         String
+  email        String @unique // küçük harfe çevrilmiş
+  passwordHash String @default("") // boşsa davet henüz kabul edilmemiş
+  active       Int    @default(1)
+  note         String @default("")
+  createdAt    String
+  lastLoginAt  String @default("")
+}
+
+model PortalToken {
+  id        String @id
+  mukellefId  String
+  tokenHash String @unique // jetonun SHA-256 özeti; jetonun kendisi saklanmaz
+  purpose   String // invite | reset
+  expiresAt String
+  usedAt    String @default("")
+  createdAt String
+
+  @@index([mukellefId])
+}
+
+model PortalFile {
+  id           String @id
+  mukellefId   String
+  direction    String // from_mukellef | from_office
+  title        String
+  category     String
+  period       String @default("") // YYYY-AA
+  originalName String
+  storedName   String // diskteki ad (rastgele); özgün ad yalnızca gösterim içindir
+  size         Int
+  requestId    String @default("")
+  createdAt    String
+  readAt       String @default("") // karşı tarafın ilk indirme/görüntüleme zamanı
+  body         String @default("") // mesajın açıklama metni; ek yoksa storedName/originalName boştur
+  hiddenByClientAt String @default("") // mükellef ofis mesajını kendi listesinden kaldırdıysa zamanı
+
+  @@index([mukellefId])
+}
+
+model DocRequest {
+  id          String @id
+  mukellefId  String
+  period      String
+  title       String
+  note        String @default("")
+  status      String @default("open") // open | done
+  createdAt   String
+  fulfilledAt String @default("")
+
+  @@index([mukellefId])
+}
+
+model LedgerEntry {
+  id          String @id
+  mukellefId  String
+  entryDate   String // YYYY-AA-GG
+  kind        String // charge (ücret/borç) | payment (ödeme)
+  amountKurus Int
+  description String
+  createdAt   String
+
+  @@index([mukellefId])
 }

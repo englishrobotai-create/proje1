@@ -16,11 +16,11 @@ async function main() {
     },
   });
 
-  const siteTitle = "SMMM Ramazan Arslantaş";
+  const siteTitle = "SMMM Ad Soyad";
 
   const aboutDefaults = {
     aboutIntro:
-      "SMMM Ramazan Arslantaş, işletmelerin vergi ve muhasebe süreçlerini düzenli, anlaşılır ve denetlenebilir şekilde yönetmesi için kurulmuş bir mali müşavirlik ofisidir.",
+      "SMMM Ad Soyad, işletmelerin vergi ve muhasebe süreçlerini düzenli, anlaşılır ve denetlenebilir şekilde yönetmesi için kurulmuş bir mali müşavirlik ofisidir.",
     aboutApproachTitle: "Çalışma yaklaşımımız",
     aboutApproachText:
       "Her müşteriye aynı standart kaliteyi sunarız: net iletişim, zamanında teslim ve belgelenmiş süreçler. Amacımız yalnızca beyanları tamamlamak değil, işletmenizin mali kararlarını daha sağlam temellere oturtmaktır.",
@@ -32,7 +32,7 @@ async function main() {
       "Kaçırılmayan tarihler, anlaşılır raporlar ve ihtiyaç anında hızlı dönüş. Büyürken yanınızda duran bir mali iş ortağı olmayı hedefleriz.",
     contactHeroTitle: "Birlikte planlayalım",
     contactHeroText:
-      "SMMM Ramazan Arslantaş ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.",
+      "SMMM Ad Soyad ile görüşmek için formu doldurun. Mesajınız doğrudan ofisimize ulaşır.",
     contactEmail: "info@ornek-mm.com",
     contactPhone: "+90 (212) 000 00 00",
     contactAddress: "İstanbul, Türkiye",
@@ -48,7 +48,7 @@ async function main() {
       linkedin: "https://linkedin.com/",
       whatsapp: "https://wa.me/905550000000",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
-      externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
+      externalNewsLabel: "Güncel Mali Gelişmeler",
       ...aboutDefaults,
     },
     create: {
@@ -61,7 +61,7 @@ async function main() {
       youtube: "",
       whatsapp: "https://wa.me/905550000000",
       externalNewsUrl: "https://www.ozcankutlu.com/api/news",
-      externalNewsLabel: "Özcan Kutlu — Güncel Mali Gelişmeler",
+      externalNewsLabel: "Güncel Mali Gelişmeler",
       ...aboutDefaults,
     },
   });

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { parseProcessSteps, saveServicesProcess } from "@/lib/services-process";
 
 export type ServiceState = {
   error?: string;
@@ -23,6 +24,14 @@ const serviceSchema = z.object({
 
 const introSchema = z.object({
   servicesIntro: z.string().trim().min(10).max(400),
+});
+
+const processSchema = z.object({
+  servicesProcess: z
+    .string()
+    .trim()
+    .min(5, "En az bir adım yazın (Başlık | Açıklama)")
+    .max(1500, "Metin en fazla 1500 karakter olabilir"),
 });
 
 function revalidateServices() {
@@ -61,6 +70,38 @@ export async function updateServicesIntroAction(
 
   revalidateServices();
   return { success: "Hizmetler sayfa açıklaması kaydedildi" };
+}
+
+export async function updateServicesProcessAction(
+  _prev: ServiceState,
+  formData: FormData,
+): Promise<ServiceState> {
+  try {
+    await requireSession();
+  } catch {
+    return { error: "Oturum gerekli" };
+  }
+
+  const parsed = processSchema.safeParse({
+    servicesProcess: formData.get("servicesProcess"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Geçersiz veri" };
+  }
+
+  if (parseProcessSteps(parsed.data.servicesProcess).length === 0) {
+    return { error: "En az bir adım yazın (Başlık | Açıklama)" };
+  }
+
+  try {
+    await saveServicesProcess(parsed.data.servicesProcess);
+  } catch {
+    return { error: "Kaydedilemedi. Lütfen tekrar deneyin." };
+  }
+
+  revalidateServices();
+  return { success: "Çalışma adımları kaydedildi" };
 }
 
 export async function createServiceAction(

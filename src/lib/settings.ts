@@ -37,12 +37,12 @@ const defaults = {
   aboutPromiseText:
     "Kaçırılmayan tarihler, anlaşılır raporlar ve ihtiyaç anında hızlı dönüş. Büyürken yanınızda duran bir mali iş ortağı olmayı hedefleriz.",
   contactHeroText:
-    "ile görüşmek için formu doldurun. Mesajlarınız yönetim paneline düşer.",
+    "ile görüşmek için formu doldurun. Mesajınız doğrudan ofisimize ulaşır.",
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const setting = await prisma.setting.findUnique({ where: { id: "main" } });
-  const siteTitle = setting?.siteTitle ?? "SMMM Ramazan Arslantaş";
+  const siteTitle = setting?.siteTitle ?? "SMMM Ad Soyad";
 
   return {
     siteTitle,
@@ -54,7 +54,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     whatsapp: setting?.whatsapp ?? "",
     externalNewsUrl: setting?.externalNewsUrl || DEFAULT_NEWS_URL,
     externalNewsLabel:
-      setting?.externalNewsLabel || "Özcan Kutlu — Güncel Mali Gelişmeler",
+      setting?.externalNewsLabel || "Güncel Mali Gelişmeler",
     aboutIntro:
       setting?.aboutIntro || `${siteTitle}, ${defaults.aboutIntro}`,
     aboutApproachTitle: setting?.aboutApproachTitle || "Çalışma yaklaşımımız",

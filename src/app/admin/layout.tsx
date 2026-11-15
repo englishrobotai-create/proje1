@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { getSession } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminLayout({
   children,
@@ -24,8 +29,10 @@ export default async function AdminLayout({
           <Link href="/admin/hizmetler">Hizmetler</Link>
           <Link href="/admin/hakkimizda">Hakkımda</Link>
           <Link href="/admin/iletisim">İletişim</Link>
+          <Link href="/admin/kvkk">KVKK Metni</Link>
           <Link href="/admin/sosyal-medya">Sosyal Medya</Link>
           <Link href="/admin/mesajlar">Mesajlar</Link>
+          <Link href="/admin/mukellefler">Mükellefler</Link>
           <Link href="/admin/ayarlar">Ayarlar</Link>
           <Link href="/" target="_blank">
             Siteyi Gör

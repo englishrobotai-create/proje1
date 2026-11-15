@@ -36,6 +36,9 @@ yarn-error.log*
 .env.*.local
 !.env.example
 
+# yüklenen mükellef belgeleri (asla depoya girmemeli)
+/storage
+
 # sqlite
 /prisma/*.db
 /prisma/*.db-journal

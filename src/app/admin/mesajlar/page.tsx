@@ -3,22 +3,28 @@ import {
   deleteMessageAction,
   markMessageReadAction,
 } from "@/app/actions/messages";
+import { MailStatusPanel } from "@/components/admin/MailStatusPanel";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getMailStatus } from "@/lib/mail";
+import { getSiteSettings } from "@/lib/settings";
 
 export default async function AdminMessagesPage() {
   const session = await getSession();
   if (!session) redirect("/admin/giris");
 
-  const messages = await prisma.message.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [messages, settings] = await Promise.all([
+    prisma.message.findMany({ orderBy: { createdAt: "desc" } }),
+    getSiteSettings(),
+  ]);
+  const mailStatus = getMailStatus(settings);
 
   return (
     <>
       <div className="admin-top">
         <h2>İletişim Mesajları</h2>
       </div>
+      <MailStatusPanel ready={mailStatus.ready} detail={mailStatus.detail} />
       <div className="admin-panel">
         {messages.length === 0 ? (
           <p style={{ margin: 0 }}>Henüz mesaj yok.</p>
@@ -47,7 +53,12 @@ export default async function AdminMessagesPage() {
                   </td>
                   <td>
                     {message.subject ? <strong>{message.subject}</strong> : null}
-                    <p style={{ margin: message.subject ? "0.35rem 0 0" : 0 }}>
+                    <p
+                      style={{
+                        margin: message.subject ? "0.35rem 0 0" : 0,
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
                       {message.body}
                     </p>
                   </td>
