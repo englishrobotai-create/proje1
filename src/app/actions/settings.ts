@@ -5,6 +5,13 @@ import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
+  checkPhotoUpload,
+  getSiteLogo,
+  removeSiteLogoFiles,
+  saveSiteLogo,
+  writeSiteLogoFile,
+} from "@/lib/site-logo";
+import {
   TITLE_SCALE_MAX,
   TITLE_SCALE_MIN,
   isTitleFontKey,
@@ -107,4 +114,53 @@ export async function updateSettingsAction(
   revalidatePath("/admin/ayarlar");
 
   return { success: "Ayarlar kaydedildi" };
+}
+
+function revalidateLogoSurfaces() {
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+  revalidatePath("/admin/ayarlar");
+}
+
+/** Üst menü / alt bilgi logosunu yükler veya değiştirir. */
+export async function updateSiteLogoAction(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  try {
+    await requireSession();
+  } catch {
+    return { error: "Oturum gerekli" };
+  }
+
+  const file = formData.get("logo");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Yüklenecek bir logo dosyası seçin." };
+  }
+
+  const check = await checkPhotoUpload(file);
+  if (!check.ok) return { error: check.error };
+
+  const current = await getSiteLogo();
+  await writeSiteLogoFile(check.ext, check.bytes);
+  await saveSiteLogo({ ext: check.ext, version: current.version + 1 });
+  revalidateLogoSurfaces();
+  return { success: "Logo güncellendi; üst menüde ve sayfa altında görünür." };
+}
+
+/** Yüklenen logoyu siler; varsayılan smmm.png kullanılır. */
+export async function removeSiteLogoAction(
+  _prev: SettingsState,
+): Promise<SettingsState> {
+  try {
+    await requireSession();
+  } catch {
+    return { error: "Oturum gerekli" };
+  }
+
+  const current = await getSiteLogo();
+  await removeSiteLogoFiles();
+  await saveSiteLogo({ ext: null, version: current.version + 1 });
+  revalidateLogoSurfaces();
+  return { success: "Logo silindi. Varsayılan logoya dönüldü." };
 }

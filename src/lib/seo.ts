@@ -117,11 +117,16 @@ export function organizationRef(settings: SiteSettings): JsonObject {
 }
 
 /** Ana ofis kimliği + web sitesi düğümü (schema.org). Yalnızca gerçek ayar verisi kullanılır. */
-export function buildSiteGraph(settings: SiteSettings): JsonObject {
+export function buildSiteGraph(
+  settings: SiteSettings,
+  /** Site köküne göre logo yolu (`/logo?v=` veya `/smmm.png`). */
+  logoPath = "/smmm.png",
+): JsonObject {
   const base = getSiteUrl();
   const email = settings.contactEmail.trim();
   const phone = settings.contactPhone.trim();
   const address = settings.contactAddress.trim();
+  const logoUrl = base ? new URL(logoPath, base).toString() : null;
   // WhatsApp bir profil sayfası olmadığı için sameAs'a girmez.
   const sameAs = getActiveSocialLinks(settings)
     .filter((item) => item.key !== "whatsapp")
@@ -132,7 +137,7 @@ export function buildSiteGraph(settings: SiteSettings): JsonObject {
     ...(base ? { "@id": `${base}/#organization`, url: base } : {}),
     name: settings.siteTitle,
     description: clip(settings.aboutIntro, 300),
-    ...(base ? { logo: `${base}/smmm.png`, image: `${base}/smmm.png` } : {}),
+    ...(logoUrl ? { logo: logoUrl, image: logoUrl } : {}),
     ...(email && email !== PLACEHOLDER_EMAIL ? { email } : {}),
     ...(phone && phone !== PLACEHOLDER_PHONE ? { telephone: phone } : {}),
     ...(address && address !== PLACEHOLDER_ADDRESS

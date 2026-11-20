@@ -5,6 +5,7 @@ import { prisma } from "./db";
 import { getMailStatus, isUsableEmail } from "./mail";
 import { getProfessionalInfo } from "./professional-info";
 import { CONTACT_PLACEHOLDERS, type SiteSettings } from "./settings";
+import { getSiteLogo } from "./site-logo";
 import { isRealSocialUrl } from "./social-links";
 
 export type ChecklistItem = {
@@ -33,14 +34,16 @@ const LOCAL_HOST = /localhost|127\.0\.0\.1|\[::1\]/i;
 export async function getLaunchChecklist(
   settings: SiteSettings,
 ): Promise<ChecklistItem[]> {
-  const [users, samplePosts, aboutPhoto, professional] = await Promise.all([
-    prisma.user.findMany({ select: { email: true, passwordHash: true } }),
-    prisma.post.count({
-      where: { slug: { in: SAMPLE_POST_SLUGS }, published: true },
-    }),
-    getAboutPhoto(),
-    getProfessionalInfo(),
-  ]);
+  const [users, samplePosts, aboutPhoto, siteLogo, professional] =
+    await Promise.all([
+      prisma.user.findMany({ select: { email: true, passwordHash: true } }),
+      prisma.post.count({
+        where: { slug: { in: SAMPLE_POST_SLUGS }, published: true },
+      }),
+      getAboutPhoto(),
+      getSiteLogo(),
+      getProfessionalInfo(),
+    ]);
 
   const passwordChecks = await Promise.all(
     users.map((user) =>
@@ -125,6 +128,15 @@ export async function getLaunchChecklist(
         "Örnek bir illüstrasyon gösteriliyor. Kendi fotoğrafınızı yükleyin ya da fotoğrafı gizleyin.",
       href: "/admin/hakkimizda",
       done: !sampleAbout,
+    },
+    {
+      id: "site-logo",
+      title: "Site logosu",
+      detail:
+        "Varsayılan logo görünüyor. Kendi logonuzu Admin > Ayarlar’dan yükleyin.",
+      href: "/admin/ayarlar",
+      optional: true,
+      done: Boolean(siteLogo.ext),
     },
     {
       id: "site-url",

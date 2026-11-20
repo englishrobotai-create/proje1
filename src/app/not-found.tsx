@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { isPortalEnabled } from "@/lib/portal-db";
 import { getSiteSettings } from "@/lib/settings";
+import { getSiteLogo, siteLogoSource } from "@/lib/site-logo";
 
 // Başlık, kök layout'taki şablonla "Sayfa bulunamadı | Site adı" olur.
 // Next.js 404 yanıtlarına kendiliğinden noindex ekler.
@@ -16,18 +17,28 @@ export const metadata: Metadata = { title: "Sayfa bulunamadı" };
  * böylece menü iki kez çizilmez.
  */
 export default async function NotFound() {
-  const [settings, portalEnabled] = await Promise.all([
+  const [settings, portalEnabled, logo] = await Promise.all([
     getSiteSettings(),
     isPortalEnabled(),
+    getSiteLogo(),
   ]);
+  const { src: logoSrc } = siteLogoSource(logo);
 
   return (
     <div className="min-h-full flex flex-col">
-      <SiteHeader settings={settings} portalEnabled={portalEnabled} />
+      <SiteHeader
+        settings={settings}
+        logoSrc={logoSrc}
+        portalEnabled={portalEnabled}
+      />
       <main className="flex-1">
         <NotFoundContent />
       </main>
-      <SiteFooter settings={settings} portalEnabled={portalEnabled} />
+      <SiteFooter
+        settings={settings}
+        logoSrc={logoSrc}
+        portalEnabled={portalEnabled}
+      />
     </div>
   );
 }

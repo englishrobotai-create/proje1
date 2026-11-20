@@ -47,7 +47,8 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         />
       </label>
       <p className="form-hint">
-        Bu başlık sitenin logosunda, sekme başlığında ve alt bilgide görünür.
+        Bu başlık üst menüde logonun yanında, sekme başlığında ve sayfa altında
+        görünür. Logo görselini yukarıdaki Logo bölümünden değiştirirsiniz.
       </p>
 
       <h3 className="admin-subtitle">Başlığın yazı tipi ve boyutu</h3>

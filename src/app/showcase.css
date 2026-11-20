@@ -1661,3 +1661,16 @@ a.ht-item:hover {
     flex-direction: column;
   }
 }
+
+/* Yönetim: site logosu (kare önizleme) */
+.logo-admin-preview {
+  width: 6rem;
+  aspect-ratio: 1;
+  background: #f4f7fb;
+}
+
+.logo-admin-img {
+  object-fit: contain;
+  object-position: center;
+  padding: 0.45rem;
+}

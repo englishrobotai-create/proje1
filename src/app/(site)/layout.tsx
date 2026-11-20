@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { isPortalEnabled } from "@/lib/portal-db";
 import { buildSiteGraph } from "@/lib/seo";
 import { getSiteSettings } from "@/lib/settings";
+import { getSiteLogo, siteLogoSource } from "@/lib/site-logo";
 import { titleCssVars } from "@/lib/title-fonts";
 
 export default async function SiteLayout({
@@ -12,13 +13,15 @@ export default async function SiteLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [settings, portalEnabled] = await Promise.all([
+  const [settings, portalEnabled, logo] = await Promise.all([
     getSiteSettings(),
     isPortalEnabled(),
+    getSiteLogo(),
   ]);
 
   // Ayarlar'dan seçilen başlık yazı tipi/boyutu; header ve footer bu değişkenleri CSS'te okur.
   const title = titleCssVars(settings.titleFont, settings.titleScale);
+  const { src: logoSrc } = siteLogoSource(logo);
 
   return (
     <div
@@ -26,11 +29,19 @@ export default async function SiteLayout({
       style={title.style}
       data-title-custom={title.custom ? "" : undefined}
     >
-      <JsonLd data={buildSiteGraph(settings)} />
+      <JsonLd data={buildSiteGraph(settings, logoSrc)} />
       <SiteEffects />
-      <SiteHeader settings={settings} portalEnabled={portalEnabled} />
+      <SiteHeader
+        settings={settings}
+        logoSrc={logoSrc}
+        portalEnabled={portalEnabled}
+      />
       <main className="flex-1">{children}</main>
-      <SiteFooter settings={settings} portalEnabled={portalEnabled} />
+      <SiteFooter
+        settings={settings}
+        logoSrc={logoSrc}
+        portalEnabled={portalEnabled}
+      />
     </div>
   );
 }

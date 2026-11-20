@@ -28,9 +28,12 @@ const links = [
 
 export function SiteHeader({
   settings,
+  logoSrc,
   portalEnabled = false,
 }: {
   settings: SiteSettings;
+  /** Üst menü logosu (`/logo?v=` veya varsayılan `/smmm.png`). */
+  logoSrc: string;
   portalEnabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -65,11 +68,12 @@ export function SiteHeader({
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
           <span className="brand-mark" aria-hidden="true">
             <Image
-              src="/smmm.png"
+              src={logoSrc}
               alt=""
               width={40}
               height={40}
               className="brand-logo"
+              unoptimized={logoSrc.startsWith("/logo")}
               priority
             />
           </span>

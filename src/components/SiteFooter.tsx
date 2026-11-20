@@ -25,9 +25,12 @@ const footerLinks = [
 
 export function SiteFooter({
   settings,
+  logoSrc,
   portalEnabled = false,
 }: {
   settings: SiteSettings;
+  /** Alt bilgi logosu (`/logo?v=` veya varsayılan `/smmm.png`). */
+  logoSrc: string;
   portalEnabled?: boolean;
 }) {
   const phoneHref = `tel:${settings.contactPhone.replace(/[^+\d]/g, "")}`;
@@ -65,7 +68,14 @@ export function SiteFooter({
           <div>
             <div className="sc-footer-brand">
               <span className="brand-mark" aria-hidden="true">
-                <Image src="/smmm.png" alt="" width={40} height={40} className="brand-logo" />
+                <Image
+                  src={logoSrc}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="brand-logo"
+                  unoptimized={logoSrc.startsWith("/logo")}
+                />
               </span>
               <p className="footer-brand">{settings.siteTitle}</p>
             </div>
