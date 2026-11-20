@@ -1,6 +1,6 @@
 /**
- * Kurulumda (prisma/seed.ts) oluşturulan varsayılan yönetici bilgisi.
- * README'de de yazılıdır; canlıya almadan önce Admin > Hesabım'dan değiştirilmelidir.
+ * Yalnızca `prisma/seed.ts` ile eklenen örnek yönetici (canlıda önerilmez).
+ * Tercih edilen yol: veritabanı boşken `/admin/kurulum` üzerinden kendi hesabınızı oluşturmak.
  * Özet sayfasındaki "Canlıya hazırlık" denetimi bu değerlerin hâlâ geçerli olup olmadığına bakar.
  */
 export const DEFAULT_ADMIN_EMAIL = "admin@ornek.com";

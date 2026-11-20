@@ -28,14 +28,14 @@ npm run dev
 `DATABASE_URL` bir **PostgreSQL** bağlantı adresi olmalıdır (yerelde Docker/PostgreSQL ya da ücretsiz bir Neon/Supabase veritabanı). Eski SQLite (`file:./dev.db`) artık desteklenmez.
 
 Site: [http://localhost:3000](http://localhost:3000)  
-Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)
+Admin: [http://localhost:3000/admin/giris](http://localhost:3000/admin/giris)  
+İlk kurulum (hiç yönetici yokken): [http://localhost:3000/admin/kurulum](http://localhost:3000/admin/kurulum)
 
-### Varsayılan giriş
+### İlk yönetici
 
-- E-posta: `admin@ornek.com`
-- Şifre: `Admin123!`
+Veritabanında hiç kullanıcı yoksa `/admin/giris` sizi `/admin/kurulum` sayfasına yönlendirir. Orada kendi e-posta ve şifrenizle (en az 10 karakter) ilk hesabı oluşturursunuz; tarayıcı yeterlidir, bilgisayarda `npm run db:seed` şart değildir.
 
-İlk kurulumdan sonra Admin > Hesabım'dan e-postayı ve şifreyi değiştirin (şifre en az 10 karakter; değişince diğer cihazlardaki oturumlar kapanır). Yönetici girişi deneme sınırlıdır (IP başına 15 dakikada 20, e-posta başına 8 deneme).
+`npm run db:setup` / `db:seed` hâlâ örnek içerik (hizmetler, örnek blog) için kullanılabilir; seed yalnızca hiç kullanıcı yokken varsayılan yöneticiyi de ekler (`admin@ornek.com` / `Admin123!`). Canlıda seed ile varsayılan şifre bırakmayın; web kurulumunu tercih edin. Yönetici girişi deneme sınırlıdır (IP başına 15 dakikada 20, e-posta başına 8 deneme).
 
 `.env` içindeki `AUTH_SECRET` değerini her müşteri kopyasında yenileyin (örn. `openssl rand -base64 32`; Windows'ta `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`). Canlıda (`NODE_ENV=production` ve `SITE_URL` localhost değilken) örnek değerle ya da 32 karakterden kısa bir `AUTH_SECRET` ile yönetici ve mükellef girişi çalışmaz; uygulama açık bir hata verir.
 
@@ -46,15 +46,8 @@ Proje Vercel'de çalışır; SQLite yerine PostgreSQL, diske yazma yerine Vercel
 1. **Veritabanı:** Vercel projesinde *Storage* sekmesinden bir Postgres (Neon) ekleyin. `DATABASE_URL` (ve havuzsuz `DATABASE_URL_UNPOOLED`) otomatik eklenir. Üretim derlemesi şemayı `prisma db push` ile kendisi oluşturur/günceller (`scripts/vercel-db-sync.mjs`); önizleme derlemeleri şemaya dokunmaz.
 2. **Dosyalar:** *Storage* sekmesinden **Private** bir Blob mağazası ekleyin (`BLOB_READ_WRITE_TOKEN` otomatik eklenir). Mükellef belgeleri gizli olduğundan mağaza mutlaka *private* olmalıdır. Vercel işlevlerinin istek gövdesi sınırı 4,5 MB olduğu için burada tek dosya en çok **4 MB** yüklenebilir (daha büyük dosyalar için doğrudan istemci yüklemesi gerekir).
 3. **Ortam değişkenleri:** `AUTH_SECRET` (en az 32 karakter, rastgele) ve `SITE_URL` (örn. `https://musteri-alanadi.com`) değerlerini *Settings > Environment Variables* bölümüne ekleyin; SMTP değişkenleri isteğe bağlıdır (`.env.example`).
-4. **İlk yönetici hesabı:** Veritabanı boşken bir kez, kendi bilgilerinizle çalıştırın (varsayılan şifreyi hiç kullanmamak için):
-   ```bash
-   ADMIN_EMAIL="siz@ofis.com" ADMIN_PASSWORD="en-az-10-karakter" DATABASE_URL="<Vercel'deki bağlantı adresi>" npm run db:seed
-   ```
-   Windows PowerShell:
-   ```powershell
-   $env:ADMIN_EMAIL="siz@ofis.com"; $env:ADMIN_PASSWORD="en-az-10-karakter"; $env:DATABASE_URL="<Vercel'deki bağlantı adresi>"; npm run db:seed
-   ```
-   Not: `db:seed` Hakkımda/İletişim gibi ayarları da varsayılanlara döndürür; yalnızca ilk kurulumda çalıştırın.
+4. **İlk yönetici hesabı:** Siteyi açıp `/admin/kurulum` adresine gidin (veya `/admin/giris` — yönlendirir). Kendi e-posta ve şifrenizle hesabı oluşturun. Bilgisayarda komut çalıştırmanız gerekmez.
+   İsteğe bağlı: örnek blog/hizmet içeriği için bir kez `npm run db:seed` (Hakkımda/İletişim metinlerini varsayılana döndürür; canlı özelleştirmeden sonra tekrar çalıştırmayın).
 
 Vercel dışında (VPS, yerel) `BLOB_READ_WRITE_TOKEN` tanımlı değilse dosyalar diskte tutulur (`PORTAL_STORAGE_DIR`, `SITE_STORAGE_DIR`), şemayı `npm run db:setup` kurar.
 

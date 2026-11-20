@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/admin/LoginForm";
-import { getSession } from "@/lib/auth";
+import { getSession, needsAdminSetup } from "@/lib/auth";
 
 export default async function AdminLoginPage() {
+  if (await needsAdminSetup()) redirect("/admin/kurulum");
+
   const session = await getSession();
   if (session) redirect("/admin");
 

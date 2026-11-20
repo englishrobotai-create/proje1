@@ -158,3 +158,21 @@ export async function loginWithCredentials(email: string, password: string) {
   await createSession(sessionUser, user.passwordHash);
   return sessionUser;
 }
+
+/** Hiç yönetici yoksa ilk kurulum sihirbazı açılır (`/admin/kurulum`). */
+export async function needsAdminSetup(): Promise<boolean> {
+  return (await prisma.user.count()) === 0;
+}
+
+/**
+ * İlk kurulum denemeleri: IP başına 15 dakikada 10.
+ * (Kurulum yalnızca kullanıcı yokken açıktır; yine de deneme taşmasını sınırlarız.)
+ */
+export async function allowAdminSetupAttempt(): Promise<boolean> {
+  const ip = await clientIp();
+  return allowRequest(
+    `admin-setup:${ip}`,
+    ip === "unknown" ? 30 : 10,
+    15 * 60_000,
+  );
+}
