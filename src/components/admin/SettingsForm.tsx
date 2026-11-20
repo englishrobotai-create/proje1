@@ -127,6 +127,100 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
         büyür. Başlık çok uzunsa büyük boyutlarda iki satıra bölünür.
       </p>
 
+      <h3 className="admin-subtitle">Ana sayfa (hero)</h3>
+      <p className="form-hint">
+        Ana sayfanın ilk bölümündeki büyük başlık, kısa metin ve iki düğme.
+      </p>
+      <label>
+        Hero başlık
+        <input
+          name="homeHeroTitle"
+          required
+          minLength={2}
+          maxLength={120}
+          defaultValue={settings.homeHeroTitle}
+        />
+      </label>
+      <label>
+        Hero kısa metin
+        <textarea
+          name="homeHeroText"
+          required
+          minLength={10}
+          maxLength={400}
+          rows={3}
+          defaultValue={settings.homeHeroText}
+        />
+      </label>
+      <div className="form-row">
+        <label>
+          Birincil düğme
+          <input
+            name="homeHeroPrimaryCta"
+            required
+            minLength={2}
+            maxLength={40}
+            defaultValue={settings.homeHeroPrimaryCta}
+          />
+        </label>
+        <label>
+          İkincil düğme
+          <input
+            name="homeHeroSecondaryCta"
+            required
+            minLength={2}
+            maxLength={40}
+            defaultValue={settings.homeHeroSecondaryCta}
+          />
+        </label>
+      </div>
+
+      <h3 className="admin-subtitle">Üst menü ve alt bilgi düğmeleri</h3>
+      <p className="form-hint">
+        Üstteki “Randevu” düğmesi ile sayfa altındaki çağrı bandı metinleri.
+      </p>
+      <label>
+        Üst menü düğmesi
+        <input
+          name="headerCtaLabel"
+          required
+          minLength={2}
+          maxLength={40}
+          defaultValue={settings.headerCtaLabel}
+        />
+      </label>
+      <label>
+        Alt bilgi başlık
+        <input
+          name="footerCtaTitle"
+          required
+          minLength={2}
+          maxLength={120}
+          defaultValue={settings.footerCtaTitle}
+        />
+      </label>
+      <label>
+        Alt bilgi kısa metin
+        <textarea
+          name="footerCtaText"
+          required
+          minLength={10}
+          maxLength={400}
+          rows={3}
+          defaultValue={settings.footerCtaText}
+        />
+      </label>
+      <label>
+        Alt bilgi düğmesi
+        <input
+          name="footerCtaButton"
+          required
+          minLength={2}
+          maxLength={40}
+          defaultValue={settings.footerCtaButton}
+        />
+      </label>
+
       <h3 className="admin-subtitle">Güncel mali gelişmeler</h3>
       <p className="form-hint">
         Ana sayfadaki “CANLI” haber şeridi bu adresten beslenir. Ne yazacağınızı bilmiyorsanız olduğu gibi bırakın.

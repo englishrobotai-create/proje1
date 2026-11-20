@@ -53,6 +53,16 @@ model Setting {
   titleFont  String @default("") // src/lib/title-fonts.ts içindeki anahtarlardan biri
   titleScale Int    @default(100) // varsayılan boyutun yüzdesi (70–150)
 
+  // Ana sayfa hero + üst menü / alt bilgi CTA metinleri (Admin > Ayarlar).
+  homeHeroTitle         String @default("Vergi ve muhasebede net, güvenilir rehberlik")
+  homeHeroText          String @default("Şirketinizin yükümlülüklerini zamanında yönetir, kararlarınızı mali görünürlükle güçlendiririz.")
+  homeHeroPrimaryCta    String @default("Görüşme Talep Et")
+  homeHeroSecondaryCta  String @default("Hizmetleri İncele")
+  headerCtaLabel        String @default("Randevu Alın")
+  footerCtaTitle        String @default("İhtiyacınızı birlikte netleştirelim")
+  footerCtaText         String @default("Kısa bir ön görüşmeyle başlayalım; kapsamı ve süreci birlikte belirleriz.")
+  footerCtaButton       String @default("Görüşme Talep Et")
+
   updatedAt DateTime @updatedAt
 }
 

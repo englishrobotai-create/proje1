@@ -44,16 +44,13 @@ export function SiteFooter({
       <div className="container">
         <div className="sc-footer-cta" data-reveal>
           <div>
-            <h2>İhtiyacınızı birlikte netleştirelim</h2>
-            <p>
-              Kısa bir ön görüşmeyle başlayalım; kapsamı ve süreci birlikte
-              belirleriz.
-            </p>
+            <h2>{settings.footerCtaTitle}</h2>
+            <p>{settings.footerCtaText}</p>
           </div>
           <div className="sc-footer-cta-actions">
             <Link href="/iletisim" className="btn btn-primary sc-shine">
               <IconCalendarCheck size={18} />
-              Görüşme Talep Et
+              {settings.footerCtaButton}
             </Link>
             {portalEnabled ? (
               <Link href="/mukellef" className="btn btn-ghost">

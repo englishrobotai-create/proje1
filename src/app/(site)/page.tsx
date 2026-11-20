@@ -94,19 +94,14 @@ export default async function HomePage() {
       <section className="hero">
         <div className="container hero-shell">
           <div className="hero-content">
-            <h1 className="hero-title">
-              Vergi ve muhasebede net, güvenilir rehberlik
-            </h1>
-            <p className="hero-text">
-              Şirketinizin yükümlülüklerini zamanında yönetir, kararlarınızı
-              mali görünürlükle güçlendiririz.
-            </p>
+            <h1 className="hero-title">{settings.homeHeroTitle}</h1>
+            <p className="hero-text">{settings.homeHeroText}</p>
             <div className="hero-actions">
               <Link href="/iletisim" className="btn btn-primary">
-                Görüşme Talep Et
+                {settings.homeHeroPrimaryCta}
               </Link>
               <Link href="/hizmetler" className="btn btn-ghost">
-                Hizmetleri İncele
+                {settings.homeHeroSecondaryCta}
               </Link>
             </div>
             {portalEnabled ? (

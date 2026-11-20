@@ -52,6 +52,15 @@ const schema = z.object({
     .min(TITLE_SCALE_MIN, `Başlık boyutu en az %${TITLE_SCALE_MIN} olabilir`)
     .max(TITLE_SCALE_MAX, `Başlık boyutu en fazla %${TITLE_SCALE_MAX} olabilir`)
     .optional(),
+  // Ana sayfa / CTA metinleri yalnızca Ayarlar formundan gelir; diğer formlar göndermez.
+  homeHeroTitle: z.string().trim().min(2).max(120).optional(),
+  homeHeroText: z.string().trim().min(10).max(400).optional(),
+  homeHeroPrimaryCta: z.string().trim().min(2).max(40).optional(),
+  homeHeroSecondaryCta: z.string().trim().min(2).max(40).optional(),
+  headerCtaLabel: z.string().trim().min(2).max(40).optional(),
+  footerCtaTitle: z.string().trim().min(2).max(120).optional(),
+  footerCtaText: z.string().trim().min(10).max(400).optional(),
+  footerCtaButton: z.string().trim().min(2).max(40).optional(),
 });
 
 export type SettingsState = {
@@ -71,6 +80,10 @@ export async function updateSettingsAction(
 
   const titleFontRaw = formData.get("titleFont");
   const titleScaleRaw = formData.get("titleScale");
+  const optionalText = (key: string) => {
+    const value = formData.get(key);
+    return typeof value === "string" ? value : undefined;
+  };
 
   const parsed = schema.safeParse({
     siteTitle: formData.get("siteTitle"),
@@ -87,19 +100,50 @@ export async function updateSettingsAction(
       typeof titleScaleRaw === "string" && titleScaleRaw.trim() !== ""
         ? Number(titleScaleRaw)
         : undefined,
+    homeHeroTitle: optionalText("homeHeroTitle"),
+    homeHeroText: optionalText("homeHeroText"),
+    homeHeroPrimaryCta: optionalText("homeHeroPrimaryCta"),
+    homeHeroSecondaryCta: optionalText("homeHeroSecondaryCta"),
+    headerCtaLabel: optionalText("headerCtaLabel"),
+    footerCtaTitle: optionalText("footerCtaTitle"),
+    footerCtaText: optionalText("footerCtaText"),
+    footerCtaButton: optionalText("footerCtaButton"),
   });
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Geçersiz veri" };
   }
 
+  const {
+    titleFont,
+    titleScale,
+    homeHeroTitle,
+    homeHeroText,
+    homeHeroPrimaryCta,
+    homeHeroSecondaryCta,
+    headerCtaLabel,
+    footerCtaTitle,
+    footerCtaText,
+    footerCtaButton,
+    ...required
+  } = parsed.data;
+
   const data = {
-    ...parsed.data,
+    ...required,
     externalNewsUrl:
-      parsed.data.externalNewsUrl || "https://www.ozcankutlu.com/api/news",
+      required.externalNewsUrl || "https://www.ozcankutlu.com/api/news",
     externalNewsLabel:
-      parsed.data.externalNewsLabel ||
-      "Güncel Mali Gelişmeler",
+      required.externalNewsLabel || "Güncel Mali Gelişmeler",
+    ...(titleFont !== undefined ? { titleFont } : {}),
+    ...(titleScale !== undefined ? { titleScale } : {}),
+    ...(homeHeroTitle !== undefined ? { homeHeroTitle } : {}),
+    ...(homeHeroText !== undefined ? { homeHeroText } : {}),
+    ...(homeHeroPrimaryCta !== undefined ? { homeHeroPrimaryCta } : {}),
+    ...(homeHeroSecondaryCta !== undefined ? { homeHeroSecondaryCta } : {}),
+    ...(headerCtaLabel !== undefined ? { headerCtaLabel } : {}),
+    ...(footerCtaTitle !== undefined ? { footerCtaTitle } : {}),
+    ...(footerCtaText !== undefined ? { footerCtaText } : {}),
+    ...(footerCtaButton !== undefined ? { footerCtaButton } : {}),
   };
 
   await prisma.setting.upsert({

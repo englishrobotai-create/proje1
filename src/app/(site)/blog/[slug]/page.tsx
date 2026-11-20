@@ -142,7 +142,7 @@ export default async function BlogPostPage({ params }: Props) {
               en kısa sürede dönüş yapılır.
             </p>
             <Link href="/iletisim" className="btn btn-primary sc-shine">
-              Görüşme Talep Et
+              {settings.homeHeroPrimaryCta}
             </Link>
           </aside>
 

@@ -102,7 +102,7 @@ export function SiteHeader({
         <div className="header-right">
           <Link href="/iletisim" className="btn btn-primary header-cta">
             <IconCalendarCheck size={17} />
-            Randevu Alın
+            {settings.headerCtaLabel}
           </Link>
           <button
             type="button"
@@ -144,7 +144,7 @@ export function SiteHeader({
             onClick={() => setOpen(false)}
           >
             <IconCalendarCheck size={17} />
-            Randevu Alın
+            {settings.headerCtaLabel}
           </Link>
         </div>
       ) : null}

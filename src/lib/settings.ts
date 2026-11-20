@@ -31,7 +31,28 @@ export type SiteSettings = {
   titleFont: string;
   /** Site başlığı boyutu, varsayılanın yüzdesi (70–150). */
   titleScale: number;
+  homeHeroTitle: string;
+  homeHeroText: string;
+  homeHeroPrimaryCta: string;
+  homeHeroSecondaryCta: string;
+  headerCtaLabel: string;
+  footerCtaTitle: string;
+  footerCtaText: string;
+  footerCtaButton: string;
 };
+
+const HOME_COPY_DEFAULTS = {
+  homeHeroTitle: "Vergi ve muhasebede net, güvenilir rehberlik",
+  homeHeroText:
+    "Şirketinizin yükümlülüklerini zamanında yönetir, kararlarınızı mali görünürlükle güçlendiririz.",
+  homeHeroPrimaryCta: "Görüşme Talep Et",
+  homeHeroSecondaryCta: "Hizmetleri İncele",
+  headerCtaLabel: "Randevu Alın",
+  footerCtaTitle: "İhtiyacınızı birlikte netleştirelim",
+  footerCtaText:
+    "Kısa bir ön görüşmeyle başlayalım; kapsamı ve süreci birlikte belirleriz.",
+  footerCtaButton: "Görüşme Talep Et",
+} as const;
 
 /** Ayar girilmemişse sitede görünen yer tutucu iletişim bilgileri (gerçek bilgi değildir). */
 export const CONTACT_PLACEHOLDERS = {
@@ -89,6 +110,21 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       "Standart hizmet paketimiz, mali müşavirlik ofisinizin temel ihtiyaçlarını kapsayacak şekilde hazırlanmıştır.",
     titleFont: normalizeTitleFont(setting?.titleFont),
     titleScale: normalizeTitleScale(setting?.titleScale),
+    homeHeroTitle: setting?.homeHeroTitle?.trim() || HOME_COPY_DEFAULTS.homeHeroTitle,
+    homeHeroText: setting?.homeHeroText?.trim() || HOME_COPY_DEFAULTS.homeHeroText,
+    homeHeroPrimaryCta:
+      setting?.homeHeroPrimaryCta?.trim() || HOME_COPY_DEFAULTS.homeHeroPrimaryCta,
+    homeHeroSecondaryCta:
+      setting?.homeHeroSecondaryCta?.trim() ||
+      HOME_COPY_DEFAULTS.homeHeroSecondaryCta,
+    headerCtaLabel:
+      setting?.headerCtaLabel?.trim() || HOME_COPY_DEFAULTS.headerCtaLabel,
+    footerCtaTitle:
+      setting?.footerCtaTitle?.trim() || HOME_COPY_DEFAULTS.footerCtaTitle,
+    footerCtaText:
+      setting?.footerCtaText?.trim() || HOME_COPY_DEFAULTS.footerCtaText,
+    footerCtaButton:
+      setting?.footerCtaButton?.trim() || HOME_COPY_DEFAULTS.footerCtaButton,
   };
 }
 
