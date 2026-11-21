@@ -279,3 +279,103 @@
   background: #0e1b30;
   color: #fff;
 }
+
+/* Form altı: SEO kontrolü + kaydet */
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.seo-check {
+  margin: 0.5rem 0 0;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--line, #d2dee7);
+  background: #f8fafb;
+}
+
+.seo-check-ok {
+  border-color: #9dceb0;
+  background: #f3faf6;
+}
+
+.seo-check-warn {
+  border-color: #e0c48a;
+  background: #fffbf2;
+}
+
+.seo-check-bad {
+  border-color: #e0a8a8;
+  background: #fff6f6;
+}
+
+.seo-check-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.seo-check-score {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.seo-check-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.88rem;
+  color: var(--steel, #5b6b7d);
+}
+
+.seo-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.seo-check-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.seo-check-item p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--steel, #5b6b7d);
+}
+
+.seo-check-badge {
+  display: inline-block;
+  margin-top: 0.1rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: #e8eef3;
+  color: #3a4a5c;
+}
+
+.seo-check-item.level-ok .seo-check-badge {
+  background: #d8f0e2;
+  color: #1d6b3d;
+}
+
+.seo-check-item.level-warn .seo-check-badge {
+  background: #f5e6c8;
+  color: #8a5a10;
+}
+
+.seo-check-item.level-bad .seo-check-badge {
+  background: #f5d4d4;
+  color: #8a2020;
+}

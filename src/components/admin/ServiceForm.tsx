@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   createServiceAction,
   updateServiceAction,
   type ServiceState,
 } from "@/app/actions/services";
+import { SeoCheckPanel } from "@/components/admin/SeoCheckPanel";
+import { checkServiceSeo, type SeoCheckResult } from "@/lib/seo-check";
 
 const initial: ServiceState = {};
 
@@ -19,6 +21,11 @@ type ServiceFormProps = {
   };
 };
 
+function field(form: HTMLFormElement, name: string): string {
+  const value = new FormData(form).get(name);
+  return typeof value === "string" ? value : "";
+}
+
 export function ServiceForm({ mode, serviceId, defaults }: ServiceFormProps) {
   const action =
     mode === "edit" && serviceId
@@ -26,6 +33,7 @@ export function ServiceForm({ mode, serviceId, defaults }: ServiceFormProps) {
       : createServiceAction;
 
   const [state, formAction, pending] = useActionState(action, initial);
+  const [seo, setSeo] = useState<SeoCheckResult | null>(null);
 
   return (
     <form action={formAction} className="admin-form">
@@ -50,6 +58,10 @@ export function ServiceForm({ mode, serviceId, defaults }: ServiceFormProps) {
           defaultValue={defaults?.description}
         />
       </label>
+      <p className="form-hint" style={{ margin: "-0.5rem 0 0" }}>
+        Bu metin hizmet kartında ve yapılandırılmış veride görünür. Kimler için,
+        ne kapsar kısaca yazın.
+      </p>
       <label>
         Sıra (küçük sayı önce görünür)
         <input
@@ -61,9 +73,28 @@ export function ServiceForm({ mode, serviceId, defaults }: ServiceFormProps) {
         />
       </label>
       {state.error ? <p className="form-error">{state.error}</p> : null}
-      <button type="submit" className="btn btn-primary" disabled={pending}>
-        {pending ? "Kaydediliyor..." : mode === "edit" ? "Güncelle" : "Ekle"}
-      </button>
+      <SeoCheckPanel result={seo} />
+      <div className="admin-form-actions">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={(event) => {
+            const form = event.currentTarget.form;
+            if (!form) return;
+            setSeo(
+              checkServiceSeo({
+                title: field(form, "title"),
+                description: field(form, "description"),
+              }),
+            );
+          }}
+        >
+          SEO kontrolü yap
+        </button>
+        <button type="submit" className="btn btn-primary" disabled={pending}>
+          {pending ? "Kaydediliyor..." : mode === "edit" ? "Güncelle" : "Ekle"}
+        </button>
+      </div>
     </form>
   );
 }

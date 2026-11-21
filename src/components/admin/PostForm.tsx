@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   createPostAction,
   updatePostAction,
   type PostState,
 } from "@/app/actions/posts";
+import { SeoCheckPanel } from "@/components/admin/SeoCheckPanel";
+import { checkBlogSeo, type SeoCheckResult } from "@/lib/seo-check";
 
 const initial: PostState = {};
 
@@ -26,6 +28,11 @@ type PostFormProps = {
   suggestedAuthor?: string;
 };
 
+function field(form: HTMLFormElement, name: string): string {
+  const value = new FormData(form).get(name);
+  return typeof value === "string" ? value : "";
+}
+
 export function PostForm({
   mode,
   postId,
@@ -38,6 +45,7 @@ export function PostForm({
       : createPostAction;
 
   const [state, formAction, pending] = useActionState(action, initial);
+  const [seo, setSeo] = useState<SeoCheckResult | null>(null);
   // Hata sonrası React formu varsayılan değerlere sıfırlar; yazılanlar kaybolmasın diye
   // sunucudan dönen değerler varsayılan olarak kullanılır.
   const v = state.values;
@@ -145,9 +153,33 @@ export function PostForm({
         Yayında
       </label>
       {state.error ? <p className="form-error">{state.error}</p> : null}
-      <button type="submit" className="btn btn-primary" disabled={pending}>
-        {pending ? "Kaydediliyor..." : mode === "edit" ? "Güncelle" : "Yayınla"}
-      </button>
+      <SeoCheckPanel result={seo} />
+      <div className="admin-form-actions">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={(event) => {
+            const form = event.currentTarget.form;
+            if (!form) return;
+            setSeo(
+              checkBlogSeo({
+                title: field(form, "title"),
+                excerpt: field(form, "excerpt"),
+                content: field(form, "content"),
+                slug: field(form, "slug"),
+                seoTitle: field(form, "seoTitle"),
+                seoDescription: field(form, "seoDescription"),
+                authorName: field(form, "authorName"),
+              }),
+            );
+          }}
+        >
+          SEO kontrolü yap
+        </button>
+        <button type="submit" className="btn btn-primary" disabled={pending}>
+          {pending ? "Kaydediliyor..." : mode === "edit" ? "Güncelle" : "Yayınla"}
+        </button>
+      </div>
     </form>
   );
 }
