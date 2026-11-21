@@ -15,14 +15,20 @@ export function SeoCheckPanel({ result }: { result: SeoCheckResult | null }) {
         <span className="seo-check-score">Puan: {result.score}/100</span>
       </div>
       <p className="seo-check-note">
-        Bu bir yayın öncesi listedir; Google sıralaması garantisi değildir. İsterseniz
-        uyarılarla kaydetmeye devam edebilirsiniz.
+        Uzunluk ve yapı kontrolüdür; metnin anlamını okumaz. Anlamsız tuşlama düşük
+        puan alır. Google sıralaması garantisi değildir.
       </p>
       <ul className="seo-check-list">
         {result.items.map((item) => (
           <li key={item.id} className={`seo-check-item level-${item.level}`}>
             <span className="seo-check-badge">
-              {item.level === "ok" ? "Tamam" : item.level === "warn" ? "Uyarı" : "Eksik"}
+              {item.level === "ok"
+                ? "Tamam"
+                : item.level === "warn"
+                  ? "Uyarı"
+                  : item.id.includes("gibberish")
+                    ? "Sorun"
+                    : "Eksik"}
             </span>
             <div>
               <strong>{item.label}</strong>

@@ -47,13 +47,102 @@ function hasInternalLink(content: string): boolean {
   return /\[[^\]]+\]\(\/(?!\/)[^)\s]*\)/.test(content);
 }
 
+const LETTER_RE = /[A-Za-zÀ-ÖØ-öø-ÿĞğİıŞşÜüÇç]/g;
+const VOWEL_RE = /[aeıioöuüAEIİOÖUÜ]/g;
+const CONSONANT_RUN_RE =
+  /[bcdfghjklmnpqrstvwxyzçğşBCDFGHJKLMNPQRSTVWXYZÇĞŞ]{5,}/;
+
+/** Aynı 3–4 harflik parçanın sık tekrarı (asdfasdf, fkdafkda…). */
+function hasRepeatedChunk(letters: string): boolean {
+  const lower = letters.toLocaleLowerCase("tr-TR");
+  if (lower.length < 12) return false;
+  for (const size of [3, 4] as const) {
+    const counts = new Map<string, number>();
+    for (let i = 0; i <= lower.length - size; i++) {
+      const chunk = lower.slice(i, i + size);
+      counts.set(chunk, (counts.get(chunk) ?? 0) + 1);
+    }
+    for (const n of counts.values()) {
+      if (n >= 3) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Anlamsız / rastgele tuşlama yakalama (AI değil; basit istatistik).
+ * Anlamı anlamaz — boşluksuz yığın, düşük sesli oranı, tekrarlayan tuşlar.
+ */
+export function looksLikeGibberish(text: string): boolean {
+  const raw = text.trim();
+  if (raw.length < 8) return false;
+
+  const letters = (raw.match(LETTER_RE) ?? []).join("");
+  if (letters.length < 8) return false;
+
+  const spaces = (raw.match(/\s/g) ?? []).length;
+  const words = raw.split(/\s+/).filter(Boolean);
+  const avgWord =
+    words.length > 0
+      ? words.reduce(
+          (sum, w) => sum + ((w.match(LETTER_RE) ?? []).length || w.length),
+          0,
+        ) / words.length
+      : letters.length;
+
+  // Boşluksuz harf yığını (başlık/açıklama tuşlaması)
+  if (spaces === 0 && letters.length >= 10) return true;
+  // Çok az boşluk + aşırı uzun “kelimeler”
+  if (raw.length >= 18 && avgWord >= 12 && words.length <= 3) return true;
+
+  const vowels = (letters.match(VOWEL_RE) ?? []).length;
+  const vowelRatio = vowels / letters.length;
+  if (letters.length >= 10 && vowelRatio < 0.22) return true;
+
+  if (/(.)\1{3,}/i.test(letters)) return true;
+  if (CONSONANT_RUN_RE.test(letters)) return true;
+  // Tekrarlayan hece yalnızca boşluksuz / çok az kelimeli tuşlamada;
+  // normal cümlede “uru”, “ler” gibi ekler yanlış pozitif verir.
+  if ((spaces === 0 || words.length <= 2) && hasRepeatedChunk(letters)) {
+    return true;
+  }
+
+  // Kısa metinde gerçekten çok az farklı harf (uzun cümlede oran doğal düşer)
+  const unique = new Set(letters.toLocaleLowerCase("tr-TR")).size;
+  if (letters.length >= 10 && letters.length <= 40 && unique <= 5) return true;
+
+  return false;
+}
+
 function scoreFrom(items: SeoCheckItem[]): number {
   let score = 100;
+  let hasGibberish = false;
   for (const item of items) {
-    if (item.level === "bad") score -= 18;
+    if (item.id.includes("gibberish")) {
+      hasGibberish = true;
+      score -= 40;
+    } else if (item.level === "bad") score -= 22;
     else if (item.level === "warn") score -= 8;
   }
+  if (hasGibberish) score = Math.min(score, 35);
   return Math.max(0, Math.min(100, score));
+}
+
+function pushGibberish(
+  items: SeoCheckItem[],
+  id: string,
+  label: string,
+  text: string,
+): boolean {
+  if (!looksLikeGibberish(text)) return false;
+  push(
+    items,
+    id,
+    "bad",
+    label,
+    "Metin okunaklı bir cümle gibi görünmüyor (rastgele harf yığını / boşluksuz yazı). Anlamlı Türkçe yazın.",
+  );
+  return true;
 }
 
 export type BlogSeoInput = {
@@ -76,25 +165,31 @@ export function checkBlogSeo(input: BlogSeoInput): SeoCheckResult {
   const seoDescription = input.seoDescription.trim() || excerpt;
   const words = countWords(content);
 
-  if (title.length < 20) {
-    push(
-      items,
-      "title-short",
-      "bad",
-      "Başlık kısa",
-      "Aranan konuyu net yazın (öneri: en az ~20 karakter, örn. “Limited şirket kuruluş maliyeti”).",
-    );
-  } else if (title.length > 70) {
-    push(
-      items,
-      "title-long",
-      "warn",
-      "Başlık uzun",
-      "Çok uzun başlıklar arama sonucunda kesilebilir; 50–65 karakter idealdir.",
-    );
-  } else {
-    push(items, "title", "ok", "Başlık", `${title.length} karakter — uygun görünüyor.`);
+  const titleGibberish = pushGibberish(items, "title-gibberish", "Başlık anlamsız", title);
+  if (!titleGibberish) {
+    if (title.length < 20) {
+      push(
+        items,
+        "title-short",
+        "bad",
+        "Başlık kısa",
+        "Aranan konuyu net yazın (öneri: en az ~20 karakter, örn. “Limited şirket kuruluş maliyeti”).",
+      );
+    } else if (title.length > 70) {
+      push(
+        items,
+        "title-long",
+        "warn",
+        "Başlık uzun",
+        "Çok uzun başlıklar arama sonucunda kesilebilir; 50–65 karakter idealdir.",
+      );
+    } else {
+      push(items, "title", "ok", "Başlık", `${title.length} karakter — uygun görünüyor.`);
+    }
   }
+
+  pushGibberish(items, "excerpt-gibberish", "Özet anlamsız", excerpt);
+  pushGibberish(items, "content-gibberish", "İçerik anlamsız", content.slice(0, 800));
 
   if (seoTitle.length > 60) {
     push(
@@ -244,66 +339,82 @@ export function checkServiceSeo(input: ServiceSeoInput): SeoCheckResult {
   const description = input.description.trim();
   const words = countWords(description);
 
-  if (title.length < 8) {
-    push(
-      items,
-      "svc-title-short",
-      "bad",
-      "Başlık kısa",
-      "Hizmeti aranan ifadeyle yazın (örn. “Şirket kuruluşu ve ana sözleşme”).",
-    );
-  } else if (title.length > 60) {
-    push(
-      items,
-      "svc-title-long",
-      "warn",
-      "Başlık uzun",
-      "Kartlarda kesilebilir; 20–50 karakter daha okunaklıdır.",
-    );
-  } else {
-    push(items, "svc-title", "ok", "Hizmet başlığı", `${title.length} karakter.`);
+  const titleGibberish = pushGibberish(
+    items,
+    "svc-title-gibberish",
+    "Başlık anlamsız",
+    title,
+  );
+  if (!titleGibberish) {
+    if (title.length < 8) {
+      push(
+        items,
+        "svc-title-short",
+        "bad",
+        "Başlık kısa",
+        "Hizmeti aranan ifadeyle yazın (örn. “Şirket kuruluşu ve ana sözleşme”).",
+      );
+    } else if (title.length > 60) {
+      push(
+        items,
+        "svc-title-long",
+        "warn",
+        "Başlık uzun",
+        "Kartlarda kesilebilir; 20–50 karakter daha okunaklıdır.",
+      );
+    } else {
+      push(items, "svc-title", "ok", "Hizmet başlığı", `${title.length} karakter.`);
+    }
   }
 
-  if (description.length < 80) {
-    push(
-      items,
-      "svc-desc-short",
-      "bad",
-      "Açıklama kısa",
-      "Kimler için, ne kapsar, nasıl ilerlersiniz — 2–3 cümle yazın (öneri: 120–300 karakter).",
-    );
-  } else if (description.length > 350) {
-    push(
-      items,
-      "svc-desc-long",
-      "warn",
-      "Açıklama uzun",
-      "Kart metni 400 karaktere kadar; çok uzunsa okunması zorlaşır.",
-    );
-  } else {
-    push(
-      items,
-      "svc-desc",
-      "ok",
-      "Açıklama",
-      `${description.length} karakter · ~${words} kelime.`,
-    );
-  }
+  const descGibberish = pushGibberish(
+    items,
+    "svc-desc-gibberish",
+    "Açıklama anlamsız",
+    description,
+  );
+  if (!descGibberish) {
+    if (description.length < 80) {
+      push(
+        items,
+        "svc-desc-short",
+        "bad",
+        "Açıklama kısa",
+        "Kimler için, ne kapsar, nasıl ilerlersiniz — 2–3 cümle yazın (öneri: 120–300 karakter).",
+      );
+    } else if (description.length > 350) {
+      push(
+        items,
+        "svc-desc-long",
+        "warn",
+        "Açıklama uzun",
+        "Kart metni 400 karaktere kadar; çok uzunsa okunması zorlaşır.",
+      );
+    } else {
+      push(
+        items,
+        "svc-desc",
+        "ok",
+        "Açıklama",
+        `${description.length} karakter · ~${words} kelime.`,
+      );
+    }
 
-  if (!/[.!?…]/.test(description)) {
-    push(
-      items,
-      "svc-sentence",
-      "warn",
-      "Cümle yapısı",
-      "Açıklamayı en az bir tam cümle olarak bitirin; şema ve okunabilirlik için iyi olur.",
-    );
+    if (!/[.!?…]/.test(description)) {
+      push(
+        items,
+        "svc-sentence",
+        "warn",
+        "Cümle yapısı",
+        "Açıklamayı en az bir tam cümle olarak bitirin; şema ve okunabilirlik için iyi olur.",
+      );
+    }
   }
 
   const generic =
     /^(hizmet|danışmanlık|muhasebe|vergi)\s*$/i.test(title) ||
     description.length < 40;
-  if (generic && title.length < 15) {
+  if (!titleGibberish && generic && title.length < 15) {
     push(
       items,
       "svc-generic",
@@ -327,40 +438,48 @@ export function checkServicesIntroSeo(
   const items: SeoCheckItem[] = [];
   const intro = input.intro.trim();
 
-  if (intro.length < 70) {
-    push(
-      items,
-      "intro-short",
-      "bad",
-      "Sayfa açıklaması kısa",
-      "Bu metin Hizmetler sayfasının SEO açıklamasında da kullanılır; ~120–160 karakter önerilir.",
-    );
-  } else if (intro.length > 160) {
-    push(
-      items,
-      "intro-long",
-      "warn",
-      "Sayfa açıklaması uzun",
-      "Arama özetinde ~160 karakter görünür; fazlası kesilebilir. İlk cümleye ana vaadi koyun.",
-    );
-  } else {
-    push(
-      items,
-      "intro",
-      "ok",
-      "Sayfa açıklaması",
-      `${intro.length} karakter — meta açıklama için uygun aralık.`,
-    );
-  }
+  const introGibberish = pushGibberish(
+    items,
+    "intro-gibberish",
+    "Sayfa açıklaması anlamsız",
+    intro,
+  );
+  if (!introGibberish) {
+    if (intro.length < 70) {
+      push(
+        items,
+        "intro-short",
+        "bad",
+        "Sayfa açıklaması kısa",
+        "Bu metin Hizmetler sayfasının SEO açıklamasında da kullanılır; ~120–160 karakter önerilir.",
+      );
+    } else if (intro.length > 160) {
+      push(
+        items,
+        "intro-long",
+        "warn",
+        "Sayfa açıklaması uzun",
+        "Arama özetinde ~160 karakter görünür; fazlası kesilebilir. İlk cümleye ana vaadi koyun.",
+      );
+    } else {
+      push(
+        items,
+        "intro",
+        "ok",
+        "Sayfa açıklaması",
+        `${intro.length} karakter — meta açıklama için uygun aralık.`,
+      );
+    }
 
-  if (!/[.!?…]/.test(intro)) {
-    push(
-      items,
-      "intro-sentence",
-      "warn",
-      "Cümle",
-      "Açıklamayı tam cümle(ler) olarak yazın.",
-    );
+    if (!/[.!?…]/.test(intro)) {
+      push(
+        items,
+        "intro-sentence",
+        "warn",
+        "Cümle",
+        "Açıklamayı tam cümle(ler) olarak yazın.",
+      );
+    }
   }
 
   return { score: scoreFrom(items), items };
