@@ -100,11 +100,28 @@ export function looksLikeGibberish(text: string): boolean {
   if (letters.length >= 10 && vowelRatio < 0.22) return true;
 
   if (/(.)\1{3,}/i.test(letters)) return true;
-  if (CONSONANT_RUN_RE.test(letters)) return true;
-  // Tekrarlayan hece yalnızca boşluksuz / çok az kelimeli tuşlamada;
-  // normal cümlede “uru”, “ler” gibi ekler yanlış pozitif verir.
-  if ((spaces === 0 || words.length <= 2) && hasRepeatedChunk(letters)) {
-    return true;
+
+  // Ünsüz zinciri / tekrarlayan hece: boşluksuz yığında veya kelime kelime.
+  // Tüm metni birleştirip bakmak “asdfgh” içeren normal cümleyi yanlış anlamsız sayar.
+  if (spaces === 0) {
+    if (CONSONANT_RUN_RE.test(letters)) return true;
+    if (hasRepeatedChunk(letters)) return true;
+  } else if (words.length <= 2) {
+    if (CONSONANT_RUN_RE.test(letters)) return true;
+    if (hasRepeatedChunk(letters)) return true;
+  } else {
+    const letterWords = words
+      .map((w) => (w.match(LETTER_RE) ?? []).join(""))
+      .filter((w) => w.length >= 4);
+    if (letterWords.length >= 3) {
+      const badWords = letterWords.filter(
+        (w) =>
+          CONSONANT_RUN_RE.test(w) ||
+          (w.length >= 6 &&
+            ((w.match(VOWEL_RE) ?? []).length) / w.length < 0.2),
+      );
+      if (badWords.length / letterWords.length >= 0.5) return true;
+    }
   }
 
   // Kısa metinde gerçekten çok az farklı harf (uzun cümlede oran doğal düşer)
@@ -145,6 +162,78 @@ function pushGibberish(
   return true;
 }
 
+const WORD_TOKEN_RE =
+  /[A-Za-zÀ-ÖØ-öø-ÿĞğİıŞşÜüÇç]{4,}/g;
+const WORD_CONSONANT_RUN_RE =
+  /[bcdfghjklmnpqrstvwxyzçğşBCDFGHJKLMNPQRSTVWXYZÇĞŞ]{4,}/;
+
+/** Tek kelime: yazım / tuş hatası gibi duruyor mu (sözlük yok; hece istatistiği). */
+export function wordLooksMisspelled(word: string): boolean {
+  const w = word.trim();
+  if (w.length < 4) return false;
+  if (!/^[A-Za-zÀ-ÖØ-öø-ÿĞğİıŞşÜüÇç]+$/.test(w)) return false;
+
+  const vowels = (w.match(VOWEL_RE) ?? []).length;
+  if (vowels === 0) return true;
+  if (w.length >= 6 && vowels / w.length < 0.2) return true;
+  if (WORD_CONSONANT_RUN_RE.test(w)) return true;
+  // Türkçede çift harf olur (ss, ll); üçlü tekrar tipik yazım/tuş hatası
+  if (/(.)\1{2,}/i.test(w)) return true;
+  // Çok uzun tek hece yığını (boşluksuz bileşik değilse şüpheli)
+  if (w.length >= 16 && vowels / w.length < 0.28) return true;
+
+  return false;
+}
+
+/**
+ * Metindeki şüpheli kelimeleri bulur (en fazla `limit` örnek).
+ * Markdown / URL parçalarını kabaca eler.
+ */
+export function findSuspiciousWords(
+  text: string,
+  limit = 5,
+): string[] {
+  const clean = text
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/[#*_`>|]/g, " ");
+
+  const found: string[] = [];
+  const seen = new Set<string>();
+  for (const match of clean.matchAll(WORD_TOKEN_RE)) {
+    const word = match[0];
+    const key = word.toLocaleLowerCase("tr-TR");
+    if (seen.has(key)) continue;
+    if (!wordLooksMisspelled(word)) continue;
+    seen.add(key);
+    found.push(word);
+    if (found.length >= limit) break;
+  }
+  return found;
+}
+
+function pushSpellingWarn(
+  items: SeoCheckItem[],
+  id: string,
+  label: string,
+  text: string,
+): boolean {
+  if (!text.trim() || looksLikeGibberish(text)) return false;
+  const bad = findSuspiciousWords(text, 5);
+  if (bad.length === 0) return false;
+  const examples = bad.map((w) => `“${w}”`).join(", ");
+  push(
+    items,
+    id,
+    "warn",
+    label,
+    `Yazım şüphesi: ${examples}. Gözden geçirin (otomatik sözlük değil; hece/tuş kontrolü).`,
+  );
+  return true;
+}
+
 export type BlogSeoInput = {
   title: string;
   excerpt: string;
@@ -161,11 +250,18 @@ export function checkBlogSeo(input: BlogSeoInput): SeoCheckResult {
   const excerpt = input.excerpt.trim();
   const content = input.content.trim();
   const slug = input.slug.trim();
-  const seoTitle = input.seoTitle.trim() || title;
-  const seoDescription = input.seoDescription.trim() || excerpt;
+  const seoTitleRaw = input.seoTitle.trim();
+  const seoDescRaw = input.seoDescription.trim();
+  const seoTitle = seoTitleRaw || title;
+  const seoDescription = seoDescRaw || excerpt;
   const words = countWords(content);
 
-  const titleGibberish = pushGibberish(items, "title-gibberish", "Başlık anlamsız", title);
+  const titleGibberish = pushGibberish(
+    items,
+    "title-gibberish",
+    "Başlık anlamsız",
+    title,
+  );
   if (!titleGibberish) {
     if (title.length < 20) {
       push(
@@ -186,20 +282,111 @@ export function checkBlogSeo(input: BlogSeoInput): SeoCheckResult {
     } else {
       push(items, "title", "ok", "Başlık", `${title.length} karakter — uygun görünüyor.`);
     }
+    pushSpellingWarn(items, "title-spelling", "Başlık yazımı", title);
   }
 
-  pushGibberish(items, "excerpt-gibberish", "Özet anlamsız", excerpt);
-  pushGibberish(items, "content-gibberish", "İçerik anlamsız", content.slice(0, 800));
+  const excerptGibberish = pushGibberish(
+    items,
+    "excerpt-gibberish",
+    "Özet anlamsız",
+    excerpt,
+  );
+  if (!excerptGibberish) {
+    if (excerpt.length < 40) {
+      push(
+        items,
+        "excerpt",
+        "warn",
+        "Özet kısa",
+        "Liste ve meta için özetin ilk cümlesinde ana vaadi yazın.",
+      );
+    } else {
+      push(items, "excerpt-ok", "ok", "Özet", "Özet alanı dolu.");
+    }
+    pushSpellingWarn(items, "excerpt-spelling", "Özet yazımı", excerpt);
+  }
 
-  if (seoTitle.length > 60) {
-    push(
+  const contentGibberish = pushGibberish(
+    items,
+    "content-gibberish",
+    "İçerik anlamsız",
+    content.slice(0, 800),
+  );
+  if (!contentGibberish) {
+    if (words < 300) {
+      push(
+        items,
+        "words-low",
+        "bad",
+        "İçerik kısa",
+        `Yaklaşık ${words} kelime. İnce içerik riski yüksek; 400+ kelime ve ara başlıklar önerilir.`,
+      );
+    } else if (words < 500) {
+      push(
+        items,
+        "words-mid",
+        "warn",
+        "İçerik orta",
+        `Yaklaşık ${words} kelime. Konuya göre 600–1200 kelime daha güvenli olabilir.`,
+      );
+    } else {
+      push(items, "words", "ok", "İçerik uzunluğu", `Yaklaşık ${words} kelime.`);
+    }
+
+    if (!hasHeading(content)) {
+      push(
+        items,
+        "headings",
+        "warn",
+        "Ara başlık yok",
+        "Uzun yazıda `##` ve `###` ara başlıklar okuyucuya ve arama motoruna yol gösterir.",
+      );
+    } else {
+      push(items, "headings-ok", "ok", "Ara başlıklar", "`##` / `###` kullanılmış.");
+    }
+
+    if (!hasInternalLink(content)) {
+      push(
+        items,
+        "links",
+        "warn",
+        "İç bağlantı yok",
+        "Örn. `[iletişim](/iletisim)` veya ilgili hizmet sayfasına link ekleyin.",
+      );
+    } else {
+      push(items, "links-ok", "ok", "İç bağlantı", "Sayfa içi bağlantı bulunuyor.");
+    }
+
+    pushSpellingWarn(
       items,
-      "seo-title",
-      "warn",
-      "SEO başlığı",
-      `Yaklaşık ${seoTitle.length} karakter; Google’da ~60 civarı kesilir. Kısaltmayı düşünün.`,
+      "content-spelling",
+      "İçerik yazımı",
+      content.slice(0, 4000),
     );
-  } else if (!input.seoTitle.trim()) {
+  }
+
+  if (seoTitleRaw) {
+    const seoTitleGib = pushGibberish(
+      items,
+      "seo-title-gibberish",
+      "SEO başlığı anlamsız",
+      seoTitleRaw,
+    );
+    if (!seoTitleGib) {
+      if (seoTitle.length > 60) {
+        push(
+          items,
+          "seo-title",
+          "warn",
+          "SEO başlığı",
+          `Yaklaşık ${seoTitle.length} karakter; Google’da ~60 civarı kesilir. Kısaltmayı düşünün.`,
+        );
+      } else {
+        push(items, "seo-title-ok", "ok", "SEO başlığı", `${seoTitle.length} karakter.`);
+      }
+      pushSpellingWarn(items, "seo-title-spelling", "SEO başlığı yazımı", seoTitleRaw);
+    }
+  } else {
     push(
       items,
       "seo-title-empty",
@@ -207,11 +394,49 @@ export function checkBlogSeo(input: BlogSeoInput): SeoCheckResult {
       "SEO başlığı boş",
       "Boşsa yazı başlığı kullanılır. İsterseniz arama için ayrı, daha net bir SEO başlığı yazın.",
     );
-  } else {
-    push(items, "seo-title-ok", "ok", "SEO başlığı", `${seoTitle.length} karakter.`);
   }
 
-  if (seoDescription.length < 70) {
+  if (seoDescRaw) {
+    const seoDescGib = pushGibberish(
+      items,
+      "seo-desc-gibberish",
+      "SEO açıklaması anlamsız",
+      seoDescRaw,
+    );
+    if (!seoDescGib) {
+      if (seoDescription.length < 70) {
+        push(
+          items,
+          "seo-desc-short",
+          "warn",
+          "SEO açıklaması kısa",
+          "Arama özetinde ~120–160 karakter daha iyi tıklanma sağlar. Ana fikri ilk cümleye koyun.",
+        );
+      } else if (seoDescription.length > 160) {
+        push(
+          items,
+          "seo-desc-long",
+          "warn",
+          "SEO açıklaması uzun",
+          "160 karakterden sonrası genelde görünmez; kısaltın.",
+        );
+      } else {
+        push(
+          items,
+          "seo-desc",
+          "ok",
+          "SEO açıklaması",
+          `${seoDescription.length} karakter — uygun aralık.`,
+        );
+      }
+      pushSpellingWarn(
+        items,
+        "seo-desc-spelling",
+        "SEO açıklaması yazımı",
+        seoDescRaw,
+      );
+    }
+  } else if (seoDescription.length < 70) {
     push(
       items,
       "seo-desc-short",
@@ -219,78 +444,14 @@ export function checkBlogSeo(input: BlogSeoInput): SeoCheckResult {
       "SEO açıklaması kısa",
       "Arama özetinde ~120–160 karakter daha iyi tıklanma sağlar. Ana fikri ilk cümleye koyun.",
     );
-  } else if (seoDescription.length > 160) {
-    push(
-      items,
-      "seo-desc-long",
-      "warn",
-      "SEO açıklaması uzun",
-      "160 karakterden sonrası genelde görünmez; kısaltın.",
-    );
   } else {
     push(
       items,
       "seo-desc",
       "ok",
       "SEO açıklaması",
-      `${seoDescription.length} karakter — uygun aralık.`,
+      `${seoDescription.length} karakter — özetten kullanılıyor.`,
     );
-  }
-
-  if (excerpt.length < 40) {
-    push(
-      items,
-      "excerpt",
-      "warn",
-      "Özet kısa",
-      "Liste ve meta için özetin ilk cümlesinde ana vaadi yazın.",
-    );
-  } else {
-    push(items, "excerpt-ok", "ok", "Özet", "Özet alanı dolu.");
-  }
-
-  if (words < 300) {
-    push(
-      items,
-      "words-low",
-      "bad",
-      "İçerik kısa",
-      `Yaklaşık ${words} kelime. İnce içerik riski yüksek; 400+ kelime ve ara başlıklar önerilir.`,
-    );
-  } else if (words < 500) {
-    push(
-      items,
-      "words-mid",
-      "warn",
-      "İçerik orta",
-      `Yaklaşık ${words} kelime. Konuya göre 600–1200 kelime daha güvenli olabilir.`,
-    );
-  } else {
-    push(items, "words", "ok", "İçerik uzunluğu", `Yaklaşık ${words} kelime.`);
-  }
-
-  if (!hasHeading(content)) {
-    push(
-      items,
-      "headings",
-      "warn",
-      "Ara başlık yok",
-      "Uzun yazıda `##` ve `###` ara başlıklar okuyucuya ve arama motoruna yol gösterir.",
-    );
-  } else {
-    push(items, "headings-ok", "ok", "Ara başlıklar", "`##` / `###` kullanılmış.");
-  }
-
-  if (!hasInternalLink(content)) {
-    push(
-      items,
-      "links",
-      "warn",
-      "İç bağlantı yok",
-      "Örn. `[iletişim](/iletisim)` veya ilgili hizmet sayfasına link ekleyin.",
-    );
-  } else {
-    push(items, "links-ok", "ok", "İç bağlantı", "Sayfa içi bağlantı bulunuyor.");
   }
 
   if (slug && slug.length > 80) {
@@ -365,6 +526,7 @@ export function checkServiceSeo(input: ServiceSeoInput): SeoCheckResult {
     } else {
       push(items, "svc-title", "ok", "Hizmet başlığı", `${title.length} karakter.`);
     }
+    pushSpellingWarn(items, "svc-title-spelling", "Başlık yazımı", title);
   }
 
   const descGibberish = pushGibberish(
@@ -409,6 +571,7 @@ export function checkServiceSeo(input: ServiceSeoInput): SeoCheckResult {
         "Açıklamayı en az bir tam cümle olarak bitirin; şema ve okunabilirlik için iyi olur.",
       );
     }
+    pushSpellingWarn(items, "svc-desc-spelling", "Açıklama yazımı", description);
   }
 
   const generic =
@@ -480,6 +643,7 @@ export function checkServicesIntroSeo(
         "Açıklamayı tam cümle(ler) olarak yazın.",
       );
     }
+    pushSpellingWarn(items, "intro-spelling", "Sayfa açıklaması yazımı", intro);
   }
 
   return { score: scoreFrom(items), items };

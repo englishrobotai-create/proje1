@@ -15,8 +15,8 @@ export function SeoCheckPanel({ result }: { result: SeoCheckResult | null }) {
         <span className="seo-check-score">Puan: {result.score}/100</span>
       </div>
       <p className="seo-check-note">
-        Uzunluk ve yapı kontrolüdür; metnin anlamını okumaz. Anlamsız tuşlama düşük
-        puan alır. Google sıralaması garantisi değildir.
+        Uzunluk, anlamsız tuşlama ve yazım şüphesi kontrolüdür (sözlük değil). Google
+        sıralaması garantisi değildir.
       </p>
       <ul className="seo-check-list">
         {result.items.map((item) => (
